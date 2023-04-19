@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.20",
+    "react-hook-form": "^7.43.9",
+    "supertest": "^6.3.3"
+  },
+  "devDependencies": {
+    "jest": "^29.3.1"
+  }
+}

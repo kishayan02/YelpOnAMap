@@ -1,0 +1,415 @@
+{
+  "song": {
+    "song_id": "0kN3oXYWWAk1uC0y2WoyOE",
+    "album_id": "43OpbkiiIxJO8ktIB777Nn",
+    "title": "Love Story",
+    "number": 9,
+    "duration": 235,
+    "plays": 639407309,
+    "danceability": 0.618,
+    "energy": 0.736,
+    "valence": 0.307,
+    "tempo": 119,
+    "key_mode": "D major",
+    "explicit": 0
+  },
+  "album": {
+    "album_id": "3lS1y25WAhcqJDATJK70Mq",
+    "title": "Midnights (3am Edition)",
+    "release_date": "2022-10-22",
+    "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02e0b60c608586d88252b8fbc0"
+  },
+  "albums": [
+    {
+      "album_id": "3lS1y25WAhcqJDATJK70Mq",
+      "title": "Midnights (3am Edition)",
+      "release_date": "2022-10-22",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02e0b60c608586d88252b8fbc0"
+    },
+    {
+      "album_id": "6kZ42qRrzov54LcAk4onW9",
+      "title": "Red (Taylor's Version)",
+      "release_date": "2021-11-12",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02318443aab3531a0558e79a4d"
+    },
+    {
+      "album_id": "4hDok0OAJd57SGIT8xuWJH",
+      "title": "Fearless (Taylor's Version)",
+      "release_date": "2021-04-09",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02a48964b5d9a3d6968ae3e0de"
+    },
+    {
+      "album_id": "6AORtDjduMM3bupSWzbTSG",
+      "title": "evermore (deluxe version)",
+      "release_date": "2021-01-07",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e0290fd9741e1838115cd90b3b6"
+    },
+    {
+      "album_id": "1pzvBxYgT6OVwJLtHkrdQK",
+      "title": "folklore (deluxe version)",
+      "release_date": "2020-08-18",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02c288028c2592f400dd0b9233"
+    },
+    {
+      "album_id": "1NAmidJlEaVgA3MpcPFYGq",
+      "title": "Lover",
+      "release_date": "2019-08-23",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02e787cffec20aa2a396a61647"
+    },
+    {
+      "album_id": "6DEjYFkNZh67HP7R9PSZvv",
+      "title": "reputation",
+      "release_date": "2017-11-10",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02da5d5aeeabacacc1263c0f4b"
+    },
+    {
+      "album_id": "34OkZVpuzBa9y40DCy0LPR",
+      "title": "1989 (Deluxe Edition)",
+      "release_date": "2014-10-27",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02332d85510aba3eb28312cfb2"
+    },
+    {
+      "album_id": "1KlU96Hw9nlvqpBPlSqcTV",
+      "title": "Red (Deluxe Edition)",
+      "release_date": "2012-10-22",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e02a7613d346501b828b56a0bc3"
+    },
+    {
+      "album_id": "5EpMjweRD573ASl7uNiHym",
+      "title": "Speak Now (Deluxe Edition)",
+      "release_date": "2010-10-25",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e022e4ec3175d848eca7b76b07f"
+    },
+    {
+      "album_id": "43OpbkiiIxJO8ktIB777Nn",
+      "title": "Fearless Platinum Edition",
+      "release_date": "2008-11-11",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e0234e5885465afc8a497ac1b7e"
+    },
+    {
+      "album_id": "7mzrIsaAjnXihW3InKjlC3",
+      "title": "Taylor Swift",
+      "release_date": "2006-10-24",
+      "thumbnail_url": "https://i.scdn.co/image/ab67616d00001e022f8c0fd72a80a93f8c53b96c"
+    }
+  ],
+  "album_songs": [
+    {
+      "song_id": "2gVhfX2Gy1T9kDuS9azrF7",
+      "title": "willow",
+      "number": 1,
+      "duration": 215,
+      "plays": 511071164
+    },
+    {
+      "song_id": "1gcyHQpBQ1lfXGdhZmWrHP",
+      "title": "champagne problems",
+      "number": 2,
+      "duration": 244,
+      "plays": 317422916
+    },
+    {
+      "song_id": "3Dby3p1m6IOZn2gIIqECgK",
+      "title": "gold rush",
+      "number": 3,
+      "duration": 185,
+      "plays": 169286592
+    },
+    {
+      "song_id": "6sQckd3Z8NPxVVKUnavY1F",
+      "title": "‘tis the damn season",
+      "number": 4,
+      "duration": 230,
+      "plays": 141027561
+    },
+    {
+      "song_id": "6lCvK2AR2uOKkVFCVlAzzm",
+      "title": "tolerate it",
+      "number": 5,
+      "duration": 245,
+      "plays": 137146059
+    },
+    {
+      "song_id": "6uwfVkaOM1mcMkFmSn35ix",
+      "title": "no body, no crime (feat. HAIM)",
+      "number": 6,
+      "duration": 216,
+      "plays": 164648283
+    },
+    {
+      "song_id": "55Vf4bimc1Rtfg0PAQRAo2",
+      "title": "happiness",
+      "number": 7,
+      "duration": 315,
+      "plays": 111288459
+    },
+    {
+      "song_id": "66tOfHVH3aUrscg8vExRV4",
+      "title": "dorothea",
+      "number": 8,
+      "duration": 226,
+      "plays": 96977480
+    },
+    {
+      "song_id": "2awNGIJHodfLZSClB3PYhz",
+      "title": "coney island (feat. The National)",
+      "number": 9,
+      "duration": 275,
+      "plays": 105257309
+    },
+    {
+      "song_id": "43Ykum9T72UOPhBN31grpN",
+      "title": "ivy",
+      "number": 10,
+      "duration": 260,
+      "plays": 122188780
+    },
+    {
+      "song_id": "52OkpDsU6MmPx1AwGOb6Ap",
+      "title": "cowboy like me",
+      "number": 11,
+      "duration": 275,
+      "plays": 99347019
+    },
+    {
+      "song_id": "5VYWxXUpxuxEmCqMLDqICo",
+      "title": "long story short",
+      "number": 12,
+      "duration": 216,
+      "plays": 113210528
+    },
+    {
+      "song_id": "5uICWmZTLkpEVbK22PBP6e",
+      "title": "marjorie",
+      "number": 13,
+      "duration": 258,
+      "plays": 92161802
+    },
+    {
+      "song_id": "6a8aUhYbaQBUI8PcJ5ZmQ6",
+      "title": "closure",
+      "number": 14,
+      "duration": 181,
+      "plays": 72441344
+    },
+    {
+      "song_id": "6Wlq9rqkxrqj5Kls4Kw14H",
+      "title": "evermore (feat. Bon Iver)",
+      "number": 15,
+      "duration": 304,
+      "plays": 120530796
+    },
+    {
+      "song_id": "3zwMVvkBe2qIKDObWgXw4N",
+      "title": "right where you left me - bonus track",
+      "number": 16,
+      "duration": 245,
+      "plays": 132702024
+    },
+    {
+      "song_id": "1kdWw77ZpYOkhxeuhzU1j6",
+      "title": "it’s time to go - bonus track",
+      "number": 17,
+      "duration": 255,
+      "plays": 54819122
+    }
+  ],
+  "top_songs_all_22": {
+    "song_id": "02Zkkf2zMkwRGQjZ7T4p8f",
+    "title": "Anti-Hero",
+    "album_id": "3lS1y25WAhcqJDATJK70Mq",
+    "album": "Midnights (3am Edition)",
+    "plays": 391829492
+  },
+  "top_songs_page_3": [
+    {
+      "song_id": "6nK2pIKFcRc5frrZKHgsiT",
+      "title": "august",
+      "album_id": "1pzvBxYgT6OVwJLtHkrdQK",
+      "album": "folklore (deluxe version)",
+      "plays": 421248742
+    },
+    {
+      "song_id": "3RauEVgRgj1IuWdJ9fDs70",
+      "title": "The Man",
+      "album_id": "1NAmidJlEaVgA3MpcPFYGq",
+      "album": "Lover",
+      "plays": 406670895
+    },
+    {
+      "song_id": "02Zkkf2zMkwRGQjZ7T4p8f",
+      "title": "Anti-Hero",
+      "album_id": "3lS1y25WAhcqJDATJK70Mq",
+      "album": "Midnights (3am Edition)",
+      "plays": 391829492
+    },
+    {
+      "song_id": "14LtANuaslKWyYbktUrHBU",
+      "title": "Enchanted",
+      "album_id": "5EpMjweRD573ASl7uNiHym",
+      "album": "Speak Now (Deluxe Edition)",
+      "plays": 381363239
+    },
+    {
+      "song_id": "0yN4fNzmVnmgC0dsOoi9Wh",
+      "title": "Bad Blood",
+      "album_id": "34OkZVpuzBa9y40DCy0LPR",
+      "album": "1989 (Deluxe Edition)",
+      "plays": 352846554
+    },
+    {
+      "song_id": "1ZY1PqizIl78geGM4xWlEA",
+      "title": "Gorgeous",
+      "album_id": "6DEjYFkNZh67HP7R9PSZvv",
+      "album": "reputation",
+      "plays": 351809119
+    },
+    {
+      "song_id": "2x0WlnmfG39ZuDmstl9xfX",
+      "title": "End Game",
+      "album_id": "6DEjYFkNZh67HP7R9PSZvv",
+      "album": "reputation",
+      "plays": 332469474
+    },
+    {
+      "song_id": "4y5bvROuBDPr5fuwXbIBZR",
+      "title": "Paper Rings",
+      "album_id": "1NAmidJlEaVgA3MpcPFYGq",
+      "album": "Lover",
+      "plays": 320430101
+    },
+    {
+      "song_id": "4pfrrhvplbJZAIsfosGWQP",
+      "title": "the 1",
+      "album_id": "1pzvBxYgT6OVwJLtHkrdQK",
+      "album": "folklore (deluxe version)",
+      "plays": 320286903
+    },
+    {
+      "song_id": "1gcyHQpBQ1lfXGdhZmWrHP",
+      "title": "champagne problems",
+      "album_id": "6AORtDjduMM3bupSWzbTSG",
+      "album": "evermore (deluxe version)",
+      "plays": 317422916
+    }
+  ],
+  "top_songs_page_5_page_size_3": [
+    {
+      "song_id": "2gVhfX2Gy1T9kDuS9azrF7",
+      "title": "willow",
+      "album_id": "6AORtDjduMM3bupSWzbTSG",
+      "album": "evermore (deluxe version)",
+      "plays": 511071164
+    },
+    {
+      "song_id": "1fo2ctLqj3zBhRQKOXprol",
+      "title": "Style",
+      "album_id": "34OkZVpuzBa9y40DCy0LPR",
+      "album": "1989 (Deluxe Edition)",
+      "plays": 505306364
+    },
+    {
+      "song_id": "5S4aYQAJOwJMAamANWlICO",
+      "title": "exile (feat. Bon Iver)",
+      "album_id": "1pzvBxYgT6OVwJLtHkrdQK",
+      "album": "folklore (deluxe version)",
+      "plays": 473133107
+    }
+  ],
+  "top_albums_all_7": {
+    "album_id": "6kZ42qRrzov54LcAk4onW9",
+    "title": "Red (Taylor's Version)",
+    "plays": 2445088157
+  },
+  "top_albums_page_2": [
+    {
+      "album_id": "4hDok0OAJd57SGIT8xuWJH",
+      "title": "Fearless (Taylor's Version)",
+      "plays": 1655617357
+    },
+    {
+      "album_id": "7mzrIsaAjnXihW3InKjlC3",
+      "title": "Taylor Swift",
+      "plays": 797392518
+    }
+  ],
+  "top_albums_page_5_page_size_1": [
+    {
+      "album_id": "1KlU96Hw9nlvqpBPlSqcTV",
+      "title": "Red (Deluxe Edition)",
+      "plays": 2766448956
+    }
+  ],
+  "search_songs_filtered": [
+    {
+      "song_id": "1q3RiD1tIWUpGsNFADMlvl",
+      "album_id": "1KlU96Hw9nlvqpBPlSqcTV",
+      "title": "All Too Well",
+      "number": 5,
+      "duration": 328,
+      "plays": 211908053,
+      "danceability": 0.602,
+      "energy": 0.609,
+      "valence": 0.337,
+      "tempo": 93,
+      "key_mode": "C major",
+      "explicit": 0
+    },
+    {
+      "song_id": "5enxwA8aAbwZbf5qCHORXi",
+      "album_id": "6kZ42qRrzov54LcAk4onW9",
+      "title": "All Too Well (10 Minute Version) (Taylor's Version) (From The Vault)",
+      "number": 30,
+      "duration": 613,
+      "plays": 439368009,
+      "danceability": 0.631,
+      "energy": 0.518,
+      "valence": 0.205,
+      "tempo": 93,
+      "key_mode": "C major",
+      "explicit": 1
+    },
+    {
+      "song_id": "0lmMtDQ2ElasKU2qDAE6NN",
+      "album_id": "34OkZVpuzBa9y40DCy0LPR",
+      "title": "All You Had To Do Was Stay",
+      "number": 5,
+      "duration": 193,
+      "plays": 143029001,
+      "danceability": 0.605,
+      "energy": 0.725,
+      "valence": 0.539,
+      "tempo": 97,
+      "key_mode": "F major",
+      "explicit": 0
+    },
+    {
+      "song_id": "1GwMQaZz6Au3QLDbjbMdme",
+      "album_id": "6DEjYFkNZh67HP7R9PSZvv",
+      "title": "Call It What You Want",
+      "number": 14,
+      "duration": 204,
+      "plays": 230510654,
+      "danceability": 0.598,
+      "energy": 0.504,
+      "valence": 0.252,
+      "tempo": 164,
+      "key_mode": "A major",
+      "explicit": 0
+    },
+    {
+      "song_id": "2m3ObD945KvpE5y9A1eUWm",
+      "album_id": "4hDok0OAJd57SGIT8xuWJH",
+      "title": "Jump Then Fall (Taylor’s Version)",
+      "number": 14,
+      "duration": 238,
+      "plays": 26829259,
+      "danceability": 0.572,
+      "energy": 0.69,
+      "valence": 0.624,
+      "tempo": 160,
+      "key_mode": "D major",
+      "explicit": 0
+    }
+  ]
+}
