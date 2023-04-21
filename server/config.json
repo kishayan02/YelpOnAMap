@@ -1,9 +1,0 @@
-{
-  "rds_host": "final-project-database.c93s2qeklrey.us-east-1.rds.amazonaws.com",
-  "rds_port": "3306",
-  "rds_user": "yelp_on_a_map",
-  "rds_password" : "CIS450YelpOnAMapEKKH!",
-  "rds_db": "YELP_ON_A_MAP",
-  "server_host": "localhost",
-  "server_port":"8080"
-}
