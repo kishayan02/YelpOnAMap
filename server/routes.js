@@ -182,6 +182,35 @@ const search_restaurants = async function(req, res) {
   });
 }
 
+const recommender = async function(req, res) {
+  const cuisine = req.query.cuisine = '';
+
+  // Here is a complete example of how to query the database in JavaScript.
+  // Only a small change (unrelated to querying) is required for TASK 3 in this route.
+  connection.query(`
+    WITH top_postal AS (
+      SELECT postal_code
+      FROM Restaurants
+      WHERE categories LIKE '%${cuisine}%'
+      GROUP BY postal_code
+      ORDER BY COUNT(name) DESC
+      LIMIT 1
+    )
+    SELECT *
+    FROM Restaurants
+    WHERE postal_code = (SELECT postal_code FROM top_postal)
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
+}
+
 // // Route 4: GET /album/:album_id
 // const album = async function(req, res) {
 //   // TODO (TASK 5): implement a route that given a album_id, returns all information about the album
@@ -244,5 +273,6 @@ module.exports = {
   hello,
   random,
   nearby_restaurants,
-  search_restaurants
+  search_restaurants,
+  recommender
 }
