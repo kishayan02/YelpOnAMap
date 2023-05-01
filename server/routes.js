@@ -186,6 +186,14 @@ const search_restaurants = async function(req, res) {
   const lat = req.query.latitude;
   const long = req.query.longitude;
   const maxDistance = req.query.dist;
+  const cuisineSearch = req.query.cuisine;
+  const jap = req.query.japanese;
+  console.log("Hello");
+  console.log(jap);
+  console.log(cuisineSearch);
+  console.log("Bye");
+  let result2 = cuisineSearch.replace(/_/g, " ");
+  let result = result2.replace(/%27/g, "'");
   if (restaurantName == '') {
     if (eliteOnly == 1) {
       //just look at eliteOnly reviews
@@ -193,7 +201,7 @@ const search_restaurants = async function(req, res) {
       SELECT R.business_id as id, name, stars, review_count, distance, address
       FROM (SELECT business_id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371,2) AS distance
           FROM Restaurants
-          WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}) R INNER JOIN  
+          WHERE ${result} ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}) R INNER JOIN  
           (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
           FROM reviews_1
           WHERE user_id in (SELECT user_id FROM Users WHERE elite IS NOT NULL)
@@ -218,7 +226,7 @@ const search_restaurants = async function(req, res) {
       connection.query(`
       SELECT business_id as id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, stars, review_count, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
       FROM Restaurants
-      WHERE stars >= ${minstars} and stars <= ${maxstars}
+      WHERE ${result} stars >= ${minstars} and stars <= ${maxstars}
           AND review_count >= ${minreviews} and review_count <= ${maxreviews}
           AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
       ORDER BY stars * review_count DESC`
@@ -243,7 +251,7 @@ const search_restaurants = async function(req, res) {
       SELECT R.business_id as id, name, stars, review_count, distance, address
       FROM (SELECT business_id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
              FROM Restaurants 
-             WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+             WHERE ${result} ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
                     AND name LIKE '%${restaurantName}%') R INNER JOIN  
           (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
           FROM reviews_1
@@ -268,7 +276,7 @@ const search_restaurants = async function(req, res) {
       connection.query(`
       SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
       FROM Restaurants
-      WHERE name LIKE '%${restaurantName}%'
+      WHERE ${result} name LIKE '%${restaurantName}%'
           AND stars >= ${minstars} and stars <= ${maxstars}
           AND review_count >= ${minreviews} and review_count <= ${maxreviews}
           AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}

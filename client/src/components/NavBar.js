@@ -37,7 +37,7 @@ export default function NavBar() {
   const [cartItemsCount, setCartItemsCount] = useState(5);
 
   useEffect(() => {
-    const cartItems = JSON.parse(localStorage.getItem("cartItems"));
+    const cartItems = JSON.parse(sessionStorage.getItem("cart"));
     if (cartItems) {
       setCartItemsCount(cartItems.length);
     }
