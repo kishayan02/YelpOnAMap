@@ -53,6 +53,24 @@ const hello = async function(req, res) {
   const userTime = userDate.toJSON().slice(11, 19);
   res.send("Hi everybody " + adjustedTimeDate + "\n" + "Time: " + userTime + "Day: " + stringDay);
 }
+// // Route 1: GET /author/:type
+// const author = async function(req, res) {
+//   // TODO (TASK 1): replace the values of name and pennKey with your own
+//   const name = 'John Doe';
+//   const pennKey = 'jdoe';
+
+//   // checks the value of type the request parameters
+//   // note that parameters are required and are specified in server.js in the endpoint by a colon (e.g. /author/:type)
+//   if (req.params.type === 'name') {
+//     // res.send returns data back to the requester via an HTTP response
+//     res.send(`Created by ${name}`);
+//   } else if (null) {
+//     // TODO (TASK 2): edit the else if condition to check if the request parameter is 'pennkey' and if so, send back response 'Created by [pennkey]'
+//   } else {
+//     // we can also send back an HTTP status code to indicate an improper request
+//     res.status(400).send(`'${req.params.type}' is not a valid author type. Valid types are 'name' and 'pennkey'.`);
+//   }
+// }
 
 // Route 2: GET /random
 const random = async function(req, res) {
@@ -62,6 +80,7 @@ const random = async function(req, res) {
   //const explicit = req.query.explicit === 'true' ? 1 : 0;
 
   // Here is a complete example of how to query the database in JavaScript.
+  // Only a small change (unrelated to querying) is required for TASK 3 in this route.
   
   const userDate = new Date();
   const userDay = userDate.getDay();
