@@ -1,10 +1,163 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+
+// import './style.css';
+import 'ol/ol.css';
+import Map from 'ol/Map.js';
+import OSM from 'ol/source/OSM.js';
+import TileLayer from 'ol/layer/Tile.js';
+import View from 'ol/View.js';
+import { fromLonLat } from 'ol/proj';
+import { Vector as VectorLayer } from 'ol/layer';
+import { Vector as VectorSource } from 'ol/source';
+import { Feature } from 'ol';
+import { Point } from 'ol/geom';
+import { Style, Icon } from 'ol/style';
 
 import SongCard from '../components/SongCard';
 import { formatDuration } from '../helpers/formatter';
 const config = require('../config.json');
+
+function MapComponent({data}) {
+  const [map, setMap] = useState(null);
+
+  // const markersSource = new VectorSource();
+
+  // // create a new vector layer for the markers
+  // const markersLayer = new VectorLayer({
+  //   source: markersSource,
+  // });
+
+  useEffect(() => {
+    const newMap = new Map({
+      target: 'map',
+      layers: [
+        new TileLayer({
+          source: new OSM(),
+        }),
+      ],
+      view: new View({
+        center: fromLonLat([-98.5795, 39.8283]),
+        zoom: 4,
+      }),
+    });
+    // add the markers layer to the map
+    // newMap.addLayer(markersLayer);
+    setMap(newMap);
+
+    return () => {
+      newMap.dispose();
+    };
+    // create a vector source and layer for the markers
+  const vectorSource = new VectorSource();
+  const vectorLayer = new VectorLayer({
+    source: vectorSource,
+    style: new Style({
+      image: new Icon({
+        src: 'https://openlayers.org/en/latest/examples/data/icon.png',
+      }),
+    }),
+  });
+  newMap.addLayer(vectorLayer);
+
+  // create a feature for each restaurant location
+  const features = data.map(item => {
+    const [longitude, latitude] = item.coordinates;
+    return new Feature({
+      geometry: new Point(fromLonLat([longitude, latitude])),
+    });
+  });
+
+  vectorSource.addFeatures(features);
+
+  // return a cleanup function to remove the vector layer when the component unmounts
+  return () => {
+    newMap.removeLayer(vectorLayer);
+  };
+  }, []);
+
+  // const vectorSource = new VectorSource();
+  // const vectorLayer = new VectorLayer({
+  //   source: vectorSource,
+  //   style: new Style({
+  //     image: new Icon({
+  //       src: 'https://openlayers.org/en/latest/examples/data/icon.png',
+  //     }),
+  //   }),
+  // });
+
+  // map.addLayer(vectorLayer);
+
+  // const features = data.map(item => {
+  //   const [longitude, latitude] = item.coordinates;
+  //   return new Feature({
+  //     geometry: new Point(fromLonLat([longitude, latitude])),
+  //   });
+  // });
+
+  // vectorSource.addFeatures(features);
+
+  //   return () => {
+  //     map.removeLayer(vectorLayer);
+  //   };
+  // }, [data, map]);
+
+  return (
+    <div id="map-container">
+      <div id="map" style={{ height: '400px', width: '100%' }}></div>
+    </div>
+  );
+}
+
+function addMarkersToMap(map, data) {
+  const layer = new VectorLayer({
+    source: new VectorSource(),
+  });
+
+  data.forEach((item) => {
+    const marker = new Feature({
+      geometry: new Point(fromLonLat([item.longitude, item.latitude])),
+    });
+    layer.getSource().addFeature(marker);
+  });
+
+  map.addLayer(layer);
+}
+
+function removeMarkersFromMap(map) {
+  map.getLayers().forEach((layer) => {
+    if (layer instanceof VectorLayer) {
+      map.removeLayer(layer);
+    }
+  });
+}
+
+// function createMap() {
+//   return new Map({
+//     target: 'map',
+//     layers: [
+//       new TileLayer({
+//         source: new OSM(),
+//       }),
+//     ],
+//     view: new View({
+//       center: fromLonLat([-98.5795, 39.8283]),
+//       zoom: 4,
+//     }),
+//   });
+// }
+
+// function RestaurantMap({ data, map }) {
+//   useEffect(() => {
+//     if (map && data.length > 0) {
+//       // create map layers and add them to the map
+//       // add markers to the map based on the restaurant locations
+//     }
+//   }, [map, data]);
+
+//   return null;
+// }
 
 export default function RecommenderPage() {
   const [pageSize, setPageSize] = useState(10);
@@ -12,16 +165,20 @@ export default function RecommenderPage() {
   const [selectedSongId, setSelectedSongId] = useState(null);
 
   const [cuisine, setCuisine] = useState('');
+  const mapRef = useRef();
+  const [map, setMap] = useState(null);
 
-  const [title, setTitle] = useState('');
-  const [duration, setDuration] = useState([60, 660]);
-  const [plays, setPlays] = useState([0, 1100000000]);
-  const [danceability, setDanceability] = useState([0, 1]);
-  const [energy, setEnergy] = useState([0, 1]);
-  const [valence, setValence] = useState([0, 1]);
-  const [explicit, setExplicit] = useState(false);
+  // const [title, setTitle] = useState('');
+  // const [duration, setDuration] = useState([60, 660]);
+  // const [plays, setPlays] = useState([0, 1100000000]);
+  // const [danceability, setDanceability] = useState([0, 1]);
+  // const [energy, setEnergy] = useState([0, 1]);
+  // const [valence, setValence] = useState([0, 1]);
+  // const [explicit, setExplicit] = useState(false);
+  
 
   useEffect(() => {
+    console.log("useEffect running");
     fetch(`http://${config.server_host}:${config.server_port}/recommender`)
       .then(res => res.json())
       .then(resJson => {
@@ -29,8 +186,91 @@ export default function RecommenderPage() {
         const restaurants = resJson.map((restaurant) => ({ id: restaurant.business_id, ...restaurant }));
         // setData(songsWithId);
         setData(restaurants);
+      })
+      .finally(() => {
+        console.log("Creating new map...");
+        const newMap = new Map({
+          target: 'map',
+          layers: [
+            new TileLayer({
+              source: new OSM(),
+            }),
+          ],
+          view: new View({
+            center: fromLonLat([-98.5795, 39.8283]),
+            zoom: 4,
+          }),
+        });
+        // setMap(newMap);
+        mapRef.current = newMap;
       });
+      // .finally(() => {
+      //   if (!mapRef.current) return; // Abort if map div doesn't exist yet
+        
+      //   const newMap = new Map({
+      //     target: mapRef.current, // Use the ref to target the map div
+      //     layers: [
+      //       new TileLayer({
+      //         source: new OSM(),
+      //       }),
+      //     ],
+      //     view: new View({
+      //       center: fromLonLat([-98.5795, 39.8283]),
+      //       zoom: 4,
+      //     }),
+      //   });
+      // });
   }, []);
+
+  // useEffect(() => {
+  //   if (!map) {
+  //     const newMap = new Map({
+  //       target: 'map',
+  //       layers: [
+  //         new TileLayer({
+  //           source: new OSM(),
+  //         }),
+  //       ],
+  //       view: new View({
+  //         center: fromLonLat([-98.5795, 39.8283]),
+  //         zoom: 4,
+  //       }),
+  //     });
+  //     setMap(newMap);
+  //     mapRef.current = newMap;
+  //   } else {
+  //     const mapInstance = mapRef.current;
+  //     mapInstance.getView().setCenter(fromLonLat([-98.5795, 39.8283]));
+  //     mapInstance.getView().setZoom(4);
+  //   }
+  // }, [map]);
+
+  // useEffect(() => {
+  //   setMap(createMap());
+  // }, []);
+
+  // useEffect(() => {
+  //   if (mapRef.current && !map) {
+  //     const newMap = new Map({
+  //       target: mapRef.current,
+  //       layers: [
+  //         new TileLayer({
+  //           source: new OSM(),
+  //         }),
+  //       ],
+  //       view: new View({
+  //         center: fromLonLat([-98.5795, 39.8283]),
+  //         zoom: 4,
+  //       }),
+  //     });
+  //     setMap(newMap);
+  //   }
+  // }, [map]);
+
+  // useEffect(() => {
+  //   removeMarkersFromMap(mapRef.current);
+  //   addMarkersToMap(mapRef.current, data);
+  // }, [data]);
 
   const search = () => {
     fetch(`http://${config.server_host}:${config.server_port}/recommender?cuisine=${cuisine}`
@@ -166,6 +406,8 @@ export default function RecommenderPage() {
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         autoHeight
       />
+      <div id='map' style={{ height: 400, width: '100%' }}></div>
+      <div>{data && <MapComponent data={data}/>} </div>
     </Container>
   );
 }
