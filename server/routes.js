@@ -183,7 +183,7 @@ const search_restaurants = async function(req, res) {
 }
 
 const recommender = async function(req, res) {
-  const cuisine = req.query.cuisine = '';
+  const cuisine = req.query.cuisine ?? '';
 
   // Here is a complete example of how to query the database in JavaScript.
   // Only a small change (unrelated to querying) is required for TASK 3 in this route.
@@ -198,7 +198,7 @@ const recommender = async function(req, res) {
     )
     SELECT *
     FROM Restaurants
-    WHERE postal_code = (SELECT postal_code FROM top_postal)
+    WHERE postal_code = (SELECT postal_code FROM top_postal) AND categories LIKE '%${cuisine}%'
   `, (err, data) => {
     if (err || data.length === 0) {
       // if there is an error for some reason, or if the query is empty (this should not be possible)

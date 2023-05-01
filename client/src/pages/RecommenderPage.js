@@ -25,8 +25,10 @@ export default function RecommenderPage() {
     fetch(`http://${config.server_host}:${config.server_port}/recommender`)
       .then(res => res.json())
       .then(resJson => {
-        const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
-        setData(songsWithId);
+        // const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
+        const restaurants = resJson.map((restaurant) => ({ id: restaurant.business_id, ...restaurant }));
+        // setData(songsWithId);
+        setData(restaurants);
       });
   }, []);
 
@@ -43,8 +45,10 @@ export default function RecommenderPage() {
       .then(resJson => {
         // DataGrid expects an array of objects with a unique id.
         // To accomplish this, we use a map with spread syntax (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
-        const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
-        setData(songsWithId);
+        // const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
+        // setData(songsWithId);
+        const restaurants = resJson.map((restaurant) => ({ id: restaurant.business_id, ...restaurant }));
+        setData(restaurants);
       });
   }
 
@@ -53,17 +57,19 @@ export default function RecommenderPage() {
   // LazyTable component. The big difference is we provide all data to the DataGrid component
   // instead of loading only the data we need (which is necessary in order to be able to sort by column)
   const columns = [
-    { field: 'title', headerName: 'Title', width: 300, renderCell: (params) => (
+    { field: 'name', headerName: 'Name', width: 300, renderCell: (params) => (
         <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
     ) },
-    { field: 'duration', headerName: 'Duration' },
-    { field: 'plays', headerName: 'Plays' },
-    { field: 'danceability', headerName: 'Danceability' },
-    { field: 'energy', headerName: 'Energy' },
-    { field: 'valence', headerName: 'Valence' },
-    { field: 'tempo', headerName: 'Tempo' },
-    { field: 'key_mode', headerName: 'Key' },
-    { field: 'explicit', headerName: 'Explicit' },
+    { field: 'cuisine', headerName: 'Cuisine' },
+    { field: 'address', headerName: 'Address'},
+    // { field: 'duration', headerName: 'Duration' },
+    // { field: 'plays', headerName: 'Plays' },
+    // { field: 'danceability', headerName: 'Danceability' },
+    // { field: 'energy', headerName: 'Energy' },
+    // { field: 'valence', headerName: 'Valence' },
+    // { field: 'tempo', headerName: 'Tempo' },
+    // { field: 'key_mode', headerName: 'Key' },
+    // { field: 'explicit', headerName: 'Explicit' },
   ]
 
   // This component makes uses of the Grid component from MUI (https://mui.com/material-ui/react-grid/).
@@ -79,9 +85,9 @@ export default function RecommenderPage() {
       <h2>Search Songs</h2>
       <Grid container spacing={6}>
         <Grid item xs={8}>
-          <TextField label='Title' value={title} onChange={(e) => setTitle(e.target.value)} style={{ width: "100%" }}/>
+          <TextField label='Cuisine' value={cuisine} onChange={(e) => setCuisine(e.target.value)} style={{ width: "100%" }}/>
         </Grid>
-        <Grid item xs={4}>
+        {/* <Grid item xs={4}>
           <FormControlLabel
             label='Explicit'
             control={<Checkbox checked={explicit} onChange={(e) => setExplicit(e.target.checked)} />}
@@ -113,7 +119,7 @@ export default function RecommenderPage() {
         </Grid>
         {/* TODO (TASK 24): add sliders for danceability, energy, and valence (they should be all in the same row of the Grid) */}
         {/* Hint: consider what value xs should be to make them fit on the same row. Set max, min, and a reasonable step. Is valueLabelFormat is necessary? */}
-        <Grid item xs={4}>
+        {/* <Grid item xs={4}>
           <p>Danceability</p>
           <Slider
             value={danceability}
@@ -145,7 +151,7 @@ export default function RecommenderPage() {
             onChange={(e, newValue) => setValence(newValue)}
             valueLabelDisplay='auto'
           />
-        </Grid>
+        </Grid> */}
       </Grid>
       <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
