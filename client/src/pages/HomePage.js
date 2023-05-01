@@ -91,12 +91,12 @@ export default function HomePage() {
     { field: 'city', headerName: 'City', width: 200},
     { field: 'state', headerName: 'State' },
   ]
-    //influential_rating, stars, city, state
+    /*//influential_rating, stars, city, state
     useEffect(() => {
         fetch(`http://${config.server_host}:${config.server_port}/nearby_restaurants`)
         .then(res => res.json())
         .then(resJson => setRestaurants(resJson));
-    }, []);
+    }, []);*/
 
   // Here, we define the columns of the "Top Songs" table. The songColumns variable is an array (in order)
   // of objects with each object representing a column. Each object has a "field" property representing
@@ -152,9 +152,9 @@ export default function HomePage() {
         </Button>
       </form>
 
-
+      
       {/* SongCard is a custom component that we made. selectedSongId && <SongCard .../> makes use of short-circuit logic to only render the SongCard if a non-null song is selected */}
-      {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
+      {/*{selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
       <h2>Check out your song of the day:&nbsp;
         <Link onClick={() => setSelectedSongId(songOfTheDay.song_id)}>{songOfTheDay.title}</Link>
       </h2>
@@ -162,9 +162,11 @@ export default function HomePage() {
       <h2>Top Songs</h2>
       <LazyTable route={`http://${config.server_host}:${config.server_port}/top_songs`} columns={songColumns} />
       <Divider />
-      <img src = {mapsImg}></img>
+      {/*<img src = {mapsImg}></img>*/}
       {/* TODO (TASK 16): add a h2 heading, LazyTable, and divider for top albums. Set the LazyTable's props for defaultPageSize to 5 and rowsPerPageOptions to [5, 10] */}
       {/* TODO (TASK 17): add a paragraph (<p>text</p>) that displays the value of your author state variable from TASK 13 */}
     </Container>
   );
+
 };
+
