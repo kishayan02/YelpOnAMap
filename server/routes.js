@@ -163,23 +163,113 @@ const search_restaurants = async function(req, res) {
   const maxstars = req.query.maxstars;
   const maxreviews = req.query.maxreviews;
   const eliteOnly = req.query.eliteOnly === 'true' ? 1 : 0;
-  connection.query(`
-    SELECT business_id as id, name, stars, review_count
-    FROM Restaurants
-    WHERE stars >= ${minstars} and stars <= ${maxstars}
-        AND review_count >= ${minreviews} and review_count <= ${maxreviews}
-    ORDER BY stars * review_count DESC`
-    , (err, data) => {
-    if (err || data.length === 0) {
-      // if there is an error for some reason, or if the query is empty (this should not be possible)
-      // print the error message and return an empty object instead
-      console.log(err);
-      res.json({});
+  const restaurantName = req.query.restaurantName;
+  const lat = req.query.latitude;
+  const long = req.query.longitude;
+  const maxDistance = req.query.dist;
+  if (restaurantName == '') {
+    if (eliteOnly == 1) {
+      //just look at eliteOnly reviews
+      connection.query(`
+      SELECT R.business_id as id, name, stars, review_count, distance, address
+      FROM (SELECT business_id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371,2) AS distance
+          FROM Restaurants
+          WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}) R INNER JOIN  
+          (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
+          FROM reviews_1
+          WHERE user_id in (SELECT user_id FROM Users WHERE elite IS NOT NULL)
+          GROUP BY business_id) E ON R.business_id = E.business_id
+      WHERE stars >= ${minstars} and stars <= ${maxstars}
+              AND review_count >= ${minreviews} and review_count <= ${maxreviews} 
+      ORDER BY stars * review_count DESC;`
+      , (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log(err);
+        res.json({});
+      } else {
+        console.log("received - search_restaurants - elite");
+        console.log(lat + "is lat and long: " + long);
+        res.json(data);
+      }
+    });
     } else {
-      console.log("received - search_restaurants");
-      res.json(data);
+      //all reviews
+      connection.query(`
+      SELECT business_id as id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, stars, review_count, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+      FROM Restaurants
+      WHERE stars >= ${minstars} and stars <= ${maxstars}
+          AND review_count >= ${minreviews} and review_count <= ${maxreviews}
+          AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+      ORDER BY stars * review_count DESC`
+      , (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log(err);
+        res.json({});
+      } else {
+        console.log("received - search_restaurants - non elite");
+        console.log(lat + "is lat and long: " + long);
+        res.json(data);
+      }
+    });
     }
-  });
+  } else {
+    //user has inputted restaurant name to search
+    if (eliteOnly == 1) {
+      //just look at eliteOnly reviews
+      connection.query(`
+      SELECT R.business_id as id, name, stars, review_count, distance, address
+      FROM (SELECT business_id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+             FROM Restaurants 
+             WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+                    AND name LIKE '%${restaurantName}%') R INNER JOIN  
+          (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
+          FROM reviews_1
+          WHERE user_id in (SELECT user_id FROM Users WHERE elite IS NOT NULL)
+          GROUP BY business_id) E ON R.business_id = E.business_id
+      WHERE stars >= ${minstars} and stars <= ${maxstars}
+              AND review_count >= ${minreviews} and review_count <= ${maxreviews}
+      ORDER BY stars * review_count DESC;`
+      , (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log(err);
+        res.json({});
+      } else {
+        console.log("received - search_restaurants - elite");
+        console.log(lat + "is lat and long: " + long);
+        res.json(data);
+      }
+    });
+    } else {
+      connection.query(`
+      SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+      FROM Restaurants
+      WHERE name LIKE '%${restaurantName}%'
+          AND stars >= ${minstars} and stars <= ${maxstars}
+          AND review_count >= ${minreviews} and review_count <= ${maxreviews}
+          AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+      ORDER BY stars * review_count DESC`
+      , (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log(err);
+        res.json({});
+      } else {
+        console.log("received - search_restaurants - non elite");
+        console.log(lat + "is lat and long: " + long);
+        res.json(data);
+      }
+    });
+    }
+  }
+  
+  
 }
 
 // // Route 4: GET /album/:album_id
