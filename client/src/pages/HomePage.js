@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Button, Container, Divider, Link } from '@mui/material';
+import { Button, Container, Divider, Link, Box} from '@mui/material';
 import { Form, NavLink } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
+import { DataGrid } from '@mui/x-data-grid';
 
 import LazyTable from '../components/LazyTable';
 import SongCard from '../components/SongCard';
 import { lightBlue } from '@mui/material/colors';
+import mapsImg from './mapsimage.jpeg'; 
 const config = require('../config.json');
 
 export default function HomePage() {
   // We use the setState hook to persist information across renders (such as the result of our API calls)
   const [songOfTheDay, setSongOfTheDay] = useState({});
-  // TODO (TASK 13): add a state variable to store the app author (default to '')
 
   // Added a state variable to keep track of the user time
   const [currUserTime, setUserTime] = useState({});
@@ -40,9 +41,10 @@ export default function HomePage() {
       // Gets the latitude and longitude of the user's location, returning an error if it fails
       navigator.geolocation.getCurrentPosition((position) => {
         setSearchStatus(null);
-        let pathPersonal = `/songs?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`;
+        setUserLatitude(position.coords.latitude);
+        setUserLongitude(position.coords.longitude);
+        let pathPersonal = `/restaurantsearch?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`;
         navigate(pathPersonal);
-        
       }, () => {
         setSearchStatus("Unable to find your location! Please try again!");
       });
@@ -54,10 +56,10 @@ export default function HomePage() {
       const latValues = getValues("latitude");
       const longValues = getValues("longitude");
 
-      let pathAny = `/songs?latitude=${latValues}&longitude=${longValues}`;
+      let pathAny = `/restaurantsearch?latitude=${latValues}&longitude=${longValues}`;
       navigate(pathAny);
     } else {
-      let pathAny = `/songs?latitude=${userLatitude}&longitude=${userLongitude}`;
+      let pathAny = `/restaurantsearch?latitude=${userLatitude}&longitude=${userLongitude}`;
       navigate(pathAny);
     }
   }
@@ -79,6 +81,22 @@ export default function HomePage() {
 
     // TODO (TASK 14): add a fetch call to get the app author (name not pennkey) and store it in the state variable
   }, []);
+
+  const [restaurants, setRestaurants] = useState([]);
+  const [pageSize, setPageSize] = useState(10);
+  const columns = [
+    { field: 'name', headerName: 'Restaurant', width: 300},
+    { field: 'influential_rating', headerName: 'Influential Rating' , width : 200},
+    { field: 'stars', headerName: 'Stars'},
+    { field: 'city', headerName: 'City', width: 200},
+    { field: 'state', headerName: 'State' },
+  ]
+    /*//influential_rating, stars, city, state
+    useEffect(() => {
+        fetch(`http://${config.server_host}:${config.server_port}/nearby_restaurants`)
+        .then(res => res.json())
+        .then(resJson => setRestaurants(resJson));
+    }, []);*/
 
   // Here, we define the columns of the "Top Songs" table. The songColumns variable is an array (in order)
   // of objects with each object representing a column. Each object has a "field" property representing
@@ -134,9 +152,9 @@ export default function HomePage() {
         </Button>
       </form>
 
-
+      
       {/* SongCard is a custom component that we made. selectedSongId && <SongCard .../> makes use of short-circuit logic to only render the SongCard if a non-null song is selected */}
-      {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
+      {/*{selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
       <h2>Check out your song of the day:&nbsp;
         <Link onClick={() => setSelectedSongId(songOfTheDay.song_id)}>{songOfTheDay.title}</Link>
       </h2>
@@ -144,8 +162,11 @@ export default function HomePage() {
       <h2>Top Songs</h2>
       <LazyTable route={`http://${config.server_host}:${config.server_port}/top_songs`} columns={songColumns} />
       <Divider />
+      {/*<img src = {mapsImg}></img>*/}
       {/* TODO (TASK 16): add a h2 heading, LazyTable, and divider for top albums. Set the LazyTable's props for defaultPageSize to 5 and rowsPerPageOptions to [5, 10] */}
       {/* TODO (TASK 17): add a paragraph (<p>text</p>) that displays the value of your author state variable from TASK 13 */}
     </Container>
   );
+
 };
+

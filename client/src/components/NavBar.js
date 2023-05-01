@@ -43,13 +43,14 @@ export default function NavBar() {
     }
   }, []);
 
+  //TODO: CHANGE RECOMMENDER AND RANDOM FOR NEW LINKS
   return (
     <AppBar position='static'>
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <NavText href='/' text='RESTAURANT HUNTER' isMain />
-          <NavText href='/albums' text='RESTAURANTS' />
-          <NavText href='/songs' text='RECOMMENDER' />
+          <NavText href='/restaurantsearch' text='RESTAURANTS' />
+          <NavText href='/songs' text='RECOMMENDER' /> 
           <NavText href='/songs' text='RANDOM!' />
           <Badge badgeContent={cartItemsCount} color='primary' sx={{ ml: 'auto' }}>
             <IconButton as="a" href="/albums" edge="end" color="inherit" aria-label="shoppingcart" sx={{ ml: 'auto' }}>

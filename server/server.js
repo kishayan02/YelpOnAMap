@@ -14,6 +14,8 @@ app.use(cors({
 app.get('/', routes.hello);
 // app.get('/author/:type', routes.author);
 app.get('/random', routes.random);
+app.get('/nearby_restaurants', routes.nearby_restaurants)
+app.get('/restaurant_search', routes.search_restaurants)
 // app.get('/song/:song_id', routes.song);
 // app.get('/album/:album_id', routes.album);
 // app.get('/albums', routes.albums);
