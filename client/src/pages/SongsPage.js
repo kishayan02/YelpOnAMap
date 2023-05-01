@@ -5,7 +5,7 @@ import { DataGrid} from '@mui/x-data-grid';
 
 
 import SongCard from '../components/SongCard';
-import ShoppingCart from '../components/ShoppingCart';
+//import ShoppingCart from '../components/ShoppingCart';
 
 import {GiFastNoodles, GiNoodleBall, GiSushis, GiChickenLeg, GiTacos} from 'react-icons/gi';
 import {FaHamburger, FaPizzaSlice, FaBoxTissue, FaPlus} from 'react-icons/fa';
@@ -233,12 +233,8 @@ export default function SongsPage() {
           </Grid>
           
         </Grid>
-        <Grid item xs={2}>
-          <p>Number of Stars</p>
-          <TextField label='Restaurant Name' value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }}/>
-        </Grid>
   
-        <Grid item xs={6}>
+        <Grid item xs={2}>
           <p>Stars</p>
           <Slider
             value={stars}
