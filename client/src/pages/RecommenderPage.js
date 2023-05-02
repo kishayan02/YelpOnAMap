@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
-// import './style.css';
+//OpenLayers Imports
 import 'ol/ol.css';
 import Map from 'ol/Map.js';
 import OSM from 'ol/source/OSM.js';
@@ -14,6 +14,9 @@ import { Vector as VectorSource } from 'ol/source';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 import { Style, Icon } from 'ol/style';
+import Overlay from 'ol/Overlay.js';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import * as bootstrap from 'bootstrap';
 
 import SongCard from '../components/SongCard';
 import { formatDuration } from '../helpers/formatter';
@@ -163,11 +166,41 @@ export default function RecommenderPage() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
   const [selectedSongId, setSelectedSongId] = useState(null);
-
+  
   const [cuisine, setCuisine] = useState('');
-  const mapRef = useRef();
+  const mapRef = useRef(null);
   const [map, setMap] = useState(null);
 
+  // Sets minimum number of stars for that restaurant
+  const [stars, setStars] = useState(0);
+  // Sets minimum number of reviews wanted for that restaurant
+  const [reviews, setReviews] = useState(0);
+
+  // Sets max distance wanted for that restaurant
+  const [distance, setDistance] = useState(100);
+  // const [distanceV, setDistanceV] = useState([0, 50]);
+
+  let count = 0;
+
+  var markerLayer = new VectorLayer({
+    source: new VectorSource(),
+  });
+
+  // Create a style for the markers
+  // var markerStyle = new Style({
+  //   image: new CircleStyle({
+  //     radius: 5,
+  //     fill: new Fill({color: 'red'}),
+  //     stroke: new Stroke({color: 'white', width: 1}),
+  //   }),
+  //   text: new Text({
+  //     text: '',
+  //     font: '12px Calibri,sans-serif',
+  //     fill: new Fill({color: 'black'}),
+  //     offsetY: -10, // Offset the text above the marker
+  //     stroke: new Stroke({color: 'white', width: 3}),
+  //   }),
+  // });
   // const [title, setTitle] = useState('');
   // const [duration, setDuration] = useState([60, 660]);
   // const [plays, setPlays] = useState([0, 1100000000]);
@@ -182,27 +215,90 @@ export default function RecommenderPage() {
     fetch(`http://${config.server_host}:${config.server_port}/recommender`)
       .then(res => res.json())
       .then(resJson => {
-        // const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
-        const restaurants = resJson.map((restaurant) => ({ id: restaurant.business_id, ...restaurant }));
-        // setData(songsWithId);
+        const restaurants = resJson.map((restaurant) => ({ id: restaurant.business_id, lat:restaurant.latitude, lon:restaurant.longitude, ...restaurant }));
         setData(restaurants);
       })
       .finally(() => {
-        console.log("Creating new map...");
-        const newMap = new Map({
+        count += 1;
+        if (count >= 0) {
+          console.log("Creating new map...");
+          // var markerLayer = new VectorLayer({
+          //   source: new VectorSource(),
+          // });
+          for (var i = 0; i < data.length; i++) {
+            var row = data[i];
+            
+            var lat = row.latitude;
+            var lon = row.longitude;
+            console.log(lat);
+            var marker = new Feature({
+              geometry: new Point(fromLonLat([lat, lon])),
+              name: row.name,
+              add: row.address,
+            });
+
+            // marker.setStyle(markerStyle.clone()); // Use a clone of the marker style to avoid overwriting the text style
+  
+            // marker.getStyle().getText().setText(row.name); // Set the text label for the marker
+          
+            markerLayer.getSource().addFeature(marker);
+          }      
+        
+          markerLayer.setZIndex(100); 
+
+          const newMap = new Map({
           target: 'map',
-          layers: [
+          layers: [ 
             new TileLayer({
               source: new OSM(),
             }),
+            markerLayer,
           ],
           view: new View({
             center: fromLonLat([-98.5795, 39.8283]),
             zoom: 4,
           }),
         });
-        // setMap(newMap);
         mapRef.current = newMap;
+        setMap(newMap);
+        const element = document.getElementById('popup');
+
+const popup = new Overlay({
+  element: element,
+  positioning: 'bottom-center',
+  stopEvent: false,
+});
+newMap.addOverlay(popup);
+
+let popover;
+function disposePopover() {
+  if (popover) {
+    popover.dispose();
+    popover = undefined;
+  }
+}
+// display popup on click
+newMap.on('click', function (evt) {
+  const feature = newMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
+    return feature;
+  });
+  disposePopover();
+  if (!feature) {
+    return;
+  }
+  popup.setPosition(evt.coordinate);
+  popover = new bootstrap.Popover(element, {
+    placement: 'top',
+    html: true,
+    content: feature.get('name'),
+  });
+  popover.show();
+});
+        // newMap.addLayer(markerLayer);
+        }
+        
+        
+        
       });
       // .finally(() => {
       //   if (!mapRef.current) return; // Abort if map div doesn't exist yet
@@ -221,6 +317,22 @@ export default function RecommenderPage() {
       //   });
       // });
   }, []);
+
+  useEffect(() => {
+    if (!data) return;
+  
+    const newSource = new VectorSource({
+      features: data.map(row => {
+        const lat = row.latitude;
+        const lon = row.longitude;
+        return new Feature({
+          geometry: new Point(fromLonLat([lon, lat]))
+        });
+      })
+    });
+  
+    markerLayer.setSource(newSource);
+  }, [data]);
 
   // useEffect(() => {
   //   if (!map) {
@@ -268,12 +380,28 @@ export default function RecommenderPage() {
   // }, [map]);
 
   // useEffect(() => {
-  //   removeMarkersFromMap(mapRef.current);
+  //   // removeMarkersFromMap(mapRef.current);
   //   addMarkersToMap(mapRef.current, data);
-  // }, [data]);
+  // }, [mapRef, data]);
+
+  useEffect(() => {
+    // Remove previous markers from the map
+    if (map) {
+      removeMarkersFromMap(map);
+    }
+    // Rest of the code...
+  }, [data]);
+  
+  useEffect(() => {
+    // Add new markers to the map
+    if (map) {
+      addMarkersToMap(map, data);
+    }
+  }, [data, map]);
 
   const search = () => {
-    fetch(`http://${config.server_host}:${config.server_port}/recommender?cuisine=${cuisine}`
+    fetch(`http://${config.server_host}:${config.server_port}/recommender?cuisine=${cuisine}` +
+      `&minStars=${stars}&minReviews=${reviews}`
       // `&duration_low=${duration[0]}&duration_high=${duration[1]}` +
       // `&plays_low=${plays[0]}&plays_high=${plays[1]}` +
       // `&danceability_low=${danceability[0]}&danceability_high=${danceability[1]}` +
@@ -300,8 +428,11 @@ export default function RecommenderPage() {
     { field: 'name', headerName: 'Name', width: 300, renderCell: (params) => (
         <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
     ) },
-    { field: 'cuisine', headerName: 'Cuisine' },
-    { field: 'address', headerName: 'Address'},
+    // { field: 'cuisine', headerName: 'Cuisine', width: 300},
+    { field: 'address', headerName: 'Address', width: 300},
+    { field: 'city', headerName: 'City', width: 300},
+    { field: 'state', headerName: 'State'},
+    { field: 'postal_code', headerName: 'Zip Code'},
     // { field: 'duration', headerName: 'Duration' },
     // { field: 'plays', headerName: 'Plays' },
     // { field: 'danceability', headerName: 'Danceability' },
@@ -322,18 +453,61 @@ export default function RecommenderPage() {
   return (
     <Container>
       {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
-      <h2>Search Songs</h2>
+      <h2>Recommender</h2>
       <Grid container spacing={6}>
-        <Grid item xs={8}>
+        <Grid item xs={12}>
           <TextField label='Cuisine' value={cuisine} onChange={(e) => setCuisine(e.target.value)} style={{ width: "100%" }}/>
+        </Grid>
+        <Grid item xs={4}>
+            <p>Max Distance</p>
+            <Slider
+              value={typeof distance === 'number' ? distance : 0}
+              min={0}
+              max={100}
+              step={5}
+              marks
+              onChange={(e, newValue) => setDistance(newValue)}
+              valueLabelDisplay='auto'
+              valueLabelFormat={value => <div>{value + " miles"}</div>}
+            />
+            <Grid item>
+          </Grid>
+          
+        </Grid>
+  
+        <Grid item xs={3}>
+          <p>Min Stars</p>
+          <Slider
+            value={stars}
+            min={0}
+            max={5}
+            step={0.5}
+            marks
+            onChange={(e, newValue) => setStars(newValue)}
+            valueLabelDisplay='auto'
+            valueLabelFormat={value => <div>{value}</div>}
+          />
+        </Grid>
+        
+        <Grid item xs={5}>
+          <p>Minimum Required Number of Reviews</p>
+          <Slider
+            value={reviews}
+            min={0}
+            max={10000}
+            step={100}
+            onChange={(e, newValue) => setReviews(newValue)}
+            valueLabelDisplay='auto'
+            // valueLabelFormat={value => <div>{formatDuration(value)}</div>}
+          />
         </Grid>
         {/* <Grid item xs={4}>
           <FormControlLabel
-            label='Explicit'
+            label='Min Stars'
             control={<Checkbox checked={explicit} onChange={(e) => setExplicit(e.target.checked)} />}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </Grid> */}
+        {/* <Grid item xs={4}>
           <p>Duration</p>
           <Slider
             value={duration}
@@ -344,8 +518,8 @@ export default function RecommenderPage() {
             valueLabelDisplay='auto'
             valueLabelFormat={value => <div>{formatDuration(value)}</div>}
           />
-        </Grid>
-        <Grid item xs={6}>
+        </Grid> */}
+        {/* <Grid item xs={6}>
           <p>Plays (millions)</p>
           <Slider
             value={plays}
@@ -406,8 +580,10 @@ export default function RecommenderPage() {
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         autoHeight
       />
-      <div id='map' style={{ height: 400, width: '100%' }}></div>
-      <div>{data && <MapComponent data={data}/>} </div>
+      <div id='map' style={{ height: 500, width: '100%' }}><div id="popup"></div></div>
+      <script src="https://cdn.jsdelivr.net/npm/elm-pep@1.0.6/dist/elm-pep.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+      {/* <div>{data && <MapComponent data={data}/>} </div> */}
     </Container>
   );
 }

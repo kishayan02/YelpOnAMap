@@ -184,6 +184,8 @@ const search_restaurants = async function(req, res) {
 
 const recommender = async function(req, res) {
   const cuisine = req.query.cuisine ?? '';
+  const minStars = req.query.minStars ?? 0;
+  const minReviews = req.query.minReviews ?? 0;
 
   // Here is a complete example of how to query the database in JavaScript.
   // Only a small change (unrelated to querying) is required for TASK 3 in this route.
@@ -191,14 +193,17 @@ const recommender = async function(req, res) {
     WITH top_postal AS (
       SELECT postal_code
       FROM Restaurants
-      WHERE categories LIKE '%${cuisine}%'
+      WHERE categories LIKE '%${cuisine}%' AND
+        stars >= ${minStars} AND review_count >= ${minReviews}
       GROUP BY postal_code
       ORDER BY COUNT(name) DESC
       LIMIT 1
     )
     SELECT *
     FROM Restaurants
-    WHERE postal_code = (SELECT postal_code FROM top_postal) AND categories LIKE '%${cuisine}%'
+    WHERE postal_code = (SELECT postal_code FROM top_postal) 
+      AND categories LIKE '%${cuisine}%' AND
+      stars >= ${minStars} AND review_count >= ${minReviews}
   `, (err, data) => {
     if (err || data.length === 0) {
       // if there is an error for some reason, or if the query is empty (this should not be possible)

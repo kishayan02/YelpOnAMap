@@ -41,8 +41,10 @@ export default function HomePage() {
       // Gets the latitude and longitude of the user's location, returning an error if it fails
       navigator.geolocation.getCurrentPosition((position) => {
         setSearchStatus(null);
-        setUserLatitude(position.coords.latitude);
-        setUserLongitude(position.coords.longitude);
+        // setUserLatitude(position.coords.latitude);
+        // setUserLongitude(position.coords.longitude);
+        sessionStorage.setItem("latitude", position.coords.latitude);
+        sessionStorage.setItem("longitude", position.coords.longitude);
         let pathPersonal = `/restaurantsearch?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`;
         navigate(pathPersonal);
       }, () => {
@@ -57,9 +59,13 @@ export default function HomePage() {
       const longValues = getValues("longitude");
 
       let pathAny = `/restaurantsearch?latitude=${latValues}&longitude=${longValues}`;
+      sessionStorage.setItem("latitude", latValues);
+      sessionStorage.setItem("longitude", longValues);
       navigate(pathAny);
     } else {
       let pathAny = `/restaurantsearch?latitude=${userLatitude}&longitude=${userLongitude}`;
+      sessionStorage.setItem("latitude", userLatitude);
+      sessionStorage.setItem("longitude", userLongitude);
       navigate(pathAny);
     }
   }
