@@ -52,7 +52,7 @@ export default function NavBar() {
           <NavText href='/restaurantsearch' text='RESTAURANTS' />
           <NavText href='/songs' text='RECOMMENDER' /> 
           <NavText href='/songs' text='RANDOM!' />
-          <NavText href='/songs' text="INFLUENTIAL YELPSTERS"/>
+          <NavText href='/yelpsters' text="INFLUENTIAL YELPSTERS"/>
           <Badge badgeContent={cartItemsCount} color='primary' sx={{ ml: 'auto' }}>
             <IconButton as="a" href="/albums" edge="end" color="inherit" aria-label="shoppingcart" sx={{ ml: 'auto' }}>
               <FaShoppingCart size={24} />

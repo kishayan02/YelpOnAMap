@@ -3,7 +3,7 @@ import { Box, Button, ButtonGroup, Link, Modal } from '@mui/material';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { NavLink } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid, gridClasses} from '@mui/x-data-grid';
 
 import { formatDuration } from '../helpers/formatter';
 const config = require('../config.json');
@@ -20,7 +20,7 @@ export default function RestaurantCard({ restaurantId, lat, longi, handleClose }
 
   // constant hook to store the reviews data
   const [reviewsData, setReviewsData] = useState([]);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(3);
 
   //const [barRadar, setBarRadar] = useState(true);
 
@@ -75,7 +75,7 @@ export default function RestaurantCard({ restaurantId, lat, longi, handleClose }
         <p>Reviews: {restaurantData.review_count} </p>
         <p>Stars: {restaurantData.stars}</p>
         <p>Distance: {restaurantData.distance} miles away</p>
-        <NavLink to={`/reviews?restaurand_id=${restaurantData.id}&name=${restaurantData.name}`}>
+        <NavLink to={`/reviews?restaurant_id=${restaurantData.id}&name=${restaurantData.name}`}>
           <Button>
             Click to see reviews for this restaurant!
           </Button>
@@ -89,8 +89,8 @@ export default function RestaurantCard({ restaurantId, lat, longi, handleClose }
                 rows={reviewsData}
                 columns={columnsReviews}
                 pageSize={pageSize}
-                rowsPerPageOptions={[5, 10, 25]}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                rowsPerPageOptions={[3, 5, 10]}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 autoHeight
                 components={{
                 NoRowsOverlay: () => (

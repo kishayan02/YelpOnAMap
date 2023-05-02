@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
 
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, gridClasses } from '@mui/x-data-grid';
 
 import SongCard from '../components/SongCard';
 import { formatDuration } from '../helpers/formatter';
@@ -40,7 +40,7 @@ export default function ReviewsPage() {
   const [selectedSongId, setSelectedSongId] = useState(null);
 
   useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/restaurant_reviews_stare?restaurant_id=${restaurantId}`)
+    fetch(`http://${config.server_host}:${config.server_port}/restaurant_reviews_stare?restaurant_id=${restaurant_Id}`)
       .then(res => res.json())
       .then(resJson => setData(resJson));
   }, []);
@@ -70,11 +70,11 @@ export default function ReviewsPage() {
   const flexFormat = { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' };
 
   const columns = [
-    { field: 'name', headerName: 'Reviewer Name', width: 300},
-    { field: 'text', headerName: 'Review', width: 350 },
-    { field: 'stars', headerName: 'Rating', width: 150 },
-    { field: 'elite', headerName: 'Elite?', width: 150 },
-    { field: 'average_stars', headerName: 'Avg. Reviewer Stars', width: 150 },
+    { field: 'name', headerName: 'Reviewer Name', width: 150},
+    { field: 'text', headerName: 'Review', width: 700 },
+    { field: 'stars', headerName: 'Rating', width: 100 },
+    { field: 'elite', headerName: 'Elite?', width: 75 },
+    { field: 'average_stars', headerName: 'Avg. Reviewer Stars', width: 100 },
   ]
 
   return (
@@ -82,7 +82,6 @@ export default function ReviewsPage() {
     // TODO (TASK 22): then uncomment the code to display the cover image and once again observe the change, i.e. what happens to the layout now that each album card has a fixed width?
     <Container>
       <h1>Reviews for {restaurant_Name}</h1>
-      <h2>Review Paramters: {restaurant_Id}</h2>
       <Grid container spacing={6}>
         <Grid item xs={8}>
           <p>Average Rating of Reviewer</p>
@@ -114,6 +113,12 @@ export default function ReviewsPage() {
         pageSize={pageSize}
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        getRowHeight={() => 'auto'}
+        sx={{
+            [`& .${gridClasses.cell}`]: {
+              py: 1,
+            },
+          }}
         autoHeight
       />
     </Container>
