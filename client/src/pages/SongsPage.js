@@ -5,6 +5,7 @@ import { DataGrid} from '@mui/x-data-grid';
 
 
 import SongCard from '../components/SongCard';
+import RestaurantCard from '../components/RestaurantCard';
 //import ShoppingCart from '../components/ShoppingCart';
 
 import {GiFastNoodles, GiNoodleBall, GiSushis, GiChickenLeg, GiTacos} from 'react-icons/gi';
@@ -19,7 +20,7 @@ const config = require('../config.json');
 export default function SongsPage() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
-  const [selectedSongId, setSelectedSongId] = useState(null);
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const queryParameters = new URLSearchParams(window.location.search);
   const [userLat, setUserLat] = useState(queryParameters.get("latitude"));
   const [userLong, setUserLong] = useState(queryParameters.get("longitude"));
@@ -36,7 +37,7 @@ export default function SongsPage() {
   //
   const [restaurantData, setRestaurantData] = useState([]);
   // Sets currently examined restaurant
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
+  
 
   // Sets minimum number of stars for that restaurant
   const [stars, setStars] = useState([0, 5]);
@@ -149,7 +150,7 @@ export default function SongsPage() {
   // instead of loading only the data we need (which is necessary in order to be able to sort by column)
   const columns = [
     { field: 'name', headerName: 'Restaurant', width: 250, renderCell: (params) => (
-      <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
+      <Link onClick={() => setSelectedRestaurantId(params.row.id)}>{params.value}</Link>
   ) },
     { field: 'stars', headerName: eliteStarColumnName, width: 100 },
     { field: 'review_count', headerName: eliteReviewColumnName , width: 100 },
@@ -261,7 +262,7 @@ export default function SongsPage() {
   // will automatically lay out all the grid items into rows based on their xs values.
   return (
       <Container>
-      {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
+      {selectedRestaurantId && <RestaurantCard restaurantId={selectedRestaurantId} lat={userLat} longi={userLong} handleClose={() => setSelectedRestaurantId(null)} />}
       <h2>Search Restaurants</h2>
       <Grid container spacing={6}>
         <Grid item xs={8}>
@@ -398,7 +399,6 @@ export default function SongsPage() {
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         autoHeight
-        checkboxSelection
         components={{
           NoRowsOverlay: () => (
             <Stack height="100%" alignItems="center" justifyContent="center">

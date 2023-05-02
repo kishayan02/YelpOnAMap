@@ -191,7 +191,7 @@ const search_restaurants = async function(req, res) {
   console.log("Hello");
   console.log(jap);
   console.log(cuisineSearch);
-  console.log("Bye");
+  console.log("Bye... grabbing restaurants");
   let result2 = cuisineSearch.replace(/_/g, " ");
   let result = result2.replace(/%27/g, "'");
   if (restaurantName == '') {
@@ -203,7 +203,7 @@ const search_restaurants = async function(req, res) {
           FROM Restaurants
           WHERE ${result} ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}) R INNER JOIN  
           (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
-          FROM reviews_1
+          FROM Reviews
           WHERE user_id in (SELECT user_id FROM Users WHERE elite IS NOT NULL)
           GROUP BY business_id) E ON R.business_id = E.business_id
       WHERE stars >= ${minstars} and stars <= ${maxstars}
@@ -254,7 +254,7 @@ const search_restaurants = async function(req, res) {
              WHERE ${result} ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
                     AND name LIKE '%${restaurantName}%') R INNER JOIN  
           (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
-          FROM reviews_1
+          FROM Reviews
           WHERE user_id in (SELECT user_id FROM Users WHERE elite IS NOT NULL)
           GROUP BY business_id) E ON R.business_id = E.business_id
       WHERE stars >= ${minstars} and stars <= ${maxstars}
@@ -297,6 +297,117 @@ const search_restaurants = async function(req, res) {
   }
   
   
+}
+
+const restaurant_info = async function(req, res) {
+  const business_id = req.query.restaurant_id;
+  const longitude = req.query.longitude;
+  const latitude = req.query.latitude;
+  console.log("getting - info");
+  connection.query(`
+    SELECT business_id as id, name, stars, review_count, ROUND(ST_Distance_Sphere(point(${longitude}, ${latitude}), point(longitude, latitude)) * 0.000621371, 2) as distance
+    FROM Restaurants
+    WHERE business_id = '${business_id}';
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      console.log("empty - info reviews");
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info");
+      
+      res.json(data[0]);
+      console.log(data[0]);
+    }
+  });
+}
+const restaurant_reviews_peek = async function(req, res) {
+  console.log("getting - info reviews");
+  const business_id = req.query.restaurant_id;
+  connection.query(`
+  SELECT R.review_id as id, text, stars
+FROM (SELECT review_id FROM ReviewsWithText_1 WHERE business_id = '${business_id}') R
+JOIN ReviewsWithText_1 R2 ON R.review_id = R2.review_id
+LIMIT 10;
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - info reviews");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info reviews");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+}
+
+const restaurant_reviews_stare = async function(req, res) {
+  console.log("getting - info reviews full");
+  const business_id = req.query.restaurant_id;
+  connection.query(`
+  select name, elite, average_stars, id, text, stars
+  FROM (SELECT user_id, review_id as id, text, stars FROM ReviewsWithText_1 WHERE business_id = '${business_id}') AS R
+  JOIN (SELECT name, (elite IS NULL) AS elite, average_stars, user_id FROM Users) U ON R.user_id = U.user_id
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - info reviews full");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info reviews full");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+}
+
+const restaurant_get_name_from_id = async function(req, res) {
+  console.log("getting - info name");
+  const business_id = req.query.restaurant_id;
+  
+  connection.query(`
+  SELECT name
+  FROM Restaurants
+  WHERE business_id = '${business_id}'
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - info  name");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info  name");
+      
+      res.json(data[0]);
+      console.log(data[0].name);
+    }
+  });
 }
 
 // // Route 4: GET /album/:album_id
@@ -361,5 +472,10 @@ module.exports = {
   hello,
   random,
   nearby_restaurants,
-  search_restaurants
+  search_restaurants,
+  restaurant_info,
+  restaurant_reviews_peek,
+  restaurant_reviews_stare,
+  restaurant_get_name_from_id
+
 }

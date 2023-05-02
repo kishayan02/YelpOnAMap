@@ -16,6 +16,10 @@ app.get('/', routes.hello);
 app.get('/random', routes.random);
 app.get('/nearby_restaurants', routes.nearby_restaurants)
 app.get('/restaurant_search', routes.search_restaurants)
+app.get('/restaurant_card', routes.restaurant_info)
+app.get('/restaurant_reviews_peek', routes.restaurant_reviews_peek)
+app.get('/restaurant_reviews_stare', routes.restaurant_reviews_stare)
+app.get('/restaurant_get_name_from_id', routes.restaurant_get_name_from_id)
 // app.get('/song/:song_id', routes.song);
 // app.get('/album/:album_id', routes.album);
 // app.get('/albums', routes.albums);
