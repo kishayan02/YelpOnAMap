@@ -177,8 +177,11 @@ export default function RecommenderPage() {
   const [reviews, setReviews] = useState(0);
 
   // Sets max distance wanted for that restaurant
-  const [distance, setDistance] = useState(100);
+  const [distance, setDistance] = useState(3000);
   // const [distanceV, setDistanceV] = useState([0, 50]);
+  
+  const lat = sessionStorage.getItem("latitude") ?? 39.952305;
+  const long = sessionStorage.getItem("longitude") ?? -75.193703;
 
   let count = 0;
 
@@ -220,7 +223,7 @@ export default function RecommenderPage() {
       })
       .finally(() => {
         count += 1;
-        if (count >= 0) {
+        if (count >= 2) {
           console.log("Creating new map...");
           // var markerLayer = new VectorLayer({
           //   source: new VectorSource(),
@@ -230,7 +233,7 @@ export default function RecommenderPage() {
             
             var lat = row.latitude;
             var lon = row.longitude;
-            console.log(lat);
+            // console.log(lat);
             var marker = new Feature({
               geometry: new Point(fromLonLat([lat, lon])),
               name: row.name,
@@ -401,7 +404,7 @@ newMap.on('click', function (evt) {
 
   const search = () => {
     fetch(`http://${config.server_host}:${config.server_port}/recommender?cuisine=${cuisine}` +
-      `&minStars=${stars}&minReviews=${reviews}`
+      `&minStars=${stars}&minReviews=${reviews}&distance=${distance}&lat=${lat}&long=${long}`
       // `&duration_low=${duration[0]}&duration_high=${duration[1]}` +
       // `&plays_low=${plays[0]}&plays_high=${plays[1]}` +
       // `&danceability_low=${danceability[0]}&danceability_high=${danceability[1]}` +
@@ -411,10 +414,13 @@ newMap.on('click', function (evt) {
     )
       .then(res => res.json())
       .then(resJson => {
+        console.log(stars);
+        console.log(reviews);
         // DataGrid expects an array of objects with a unique id.
         // To accomplish this, we use a map with spread syntax (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
         // const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
         // setData(songsWithId);
+        console.log(resJson);
         const restaurants = resJson.map((restaurant) => ({ id: restaurant.business_id, ...restaurant }));
         setData(restaurants);
       });
@@ -429,10 +435,13 @@ newMap.on('click', function (evt) {
         <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
     ) },
     // { field: 'cuisine', headerName: 'Cuisine', width: 300},
-    { field: 'address', headerName: 'Address', width: 300},
-    { field: 'city', headerName: 'City', width: 300},
-    { field: 'state', headerName: 'State'},
-    { field: 'postal_code', headerName: 'Zip Code'},
+    { field: 'address', headerName: 'Address', width: 500},
+    { field: 'stars', headerName: 'Stars'},
+    { field: 'review_count', headerName: '# Reviews'},
+    { field: 'distance', headerName: 'Distance (miles)', width: 200}
+    // { field: 'city', headerName: 'City', width: 300},
+    // { field: 'state', headerName: 'State'},
+    // { field: 'postal_code', headerName: 'Zip Code'},
     // { field: 'duration', headerName: 'Duration' },
     // { field: 'plays', headerName: 'Plays' },
     // { field: 'danceability', headerName: 'Danceability' },
@@ -454,6 +463,7 @@ newMap.on('click', function (evt) {
     <Container>
       {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
       <h2>Recommender</h2>
+      
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <TextField label='Cuisine' value={cuisine} onChange={(e) => setCuisine(e.target.value)} style={{ width: "100%" }}/>
@@ -463,8 +473,8 @@ newMap.on('click', function (evt) {
             <Slider
               value={typeof distance === 'number' ? distance : 0}
               min={0}
-              max={100}
-              step={5}
+              max={3000}
+              step={10}
               marks
               onChange={(e, newValue) => setDistance(newValue)}
               valueLabelDisplay='auto'
@@ -570,6 +580,9 @@ newMap.on('click', function (evt) {
       <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
       </Button>
+      <div id='map' style={{ height: 500, width: '100%' }}><div id="popup"></div></div>
+      <script src="https://cdn.jsdelivr.net/npm/elm-pep@1.0.6/dist/elm-pep.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
       <h2>Results</h2>
       {/* Notice how similar the DataGrid component is to our LazyTable! What are the differences? */}
       <DataGrid
@@ -580,9 +593,7 @@ newMap.on('click', function (evt) {
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         autoHeight
       />
-      <div id='map' style={{ height: 500, width: '100%' }}><div id="popup"></div></div>
-      <script src="https://cdn.jsdelivr.net/npm/elm-pep@1.0.6/dist/elm-pep.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+      
       {/* <div>{data && <MapComponent data={data}/>} </div> */}
     </Container>
   );
