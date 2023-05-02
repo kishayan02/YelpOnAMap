@@ -187,11 +187,6 @@ const search_restaurants = async function(req, res) {
   const long = req.query.longitude;
   const maxDistance = req.query.dist;
   const cuisineSearch = req.query.cuisine;
-  const jap = req.query.japanese;
-  console.log("Hello");
-  console.log(jap);
-  console.log(cuisineSearch);
-  console.log("Bye... grabbing restaurants");
   let result2 = cuisineSearch.replace(/_/g, " ");
   let result = result2.replace(/%27/g, "'");
   if (restaurantName == '') {
@@ -396,8 +391,6 @@ const recommender = async function(req, res) {
   const lat = req.query.lat ?? 39.952305;
   const long = req.query.long ?? -75.193703;
 
-  // Here is a complete example of how to query the database in JavaScript.
-  // Only a small change (unrelated to querying) is required for TASK 3 in this route.
   connection.query(`
     WITH top_postal AS (
       SELECT postal_code
