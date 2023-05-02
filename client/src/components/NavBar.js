@@ -50,7 +50,7 @@ export default function NavBar() {
         <Toolbar disableGutters>
           <NavText href='/' text='RESTAURANT HUNTER' isMain />
           <NavText href='/restaurantsearch' text='RESTAURANTS' />
-          <NavText href='/songs' text='RECOMMENDER' /> 
+          <NavText href='/recommender' text='RECOMMENDER' /> 
           <NavText href='/songs' text='RANDOM!' />
           <NavText href='/yelpsters' text="INFLUENTIAL YELPSTERS"/>
           <Badge badgeContent={cartItemsCount} color='primary' sx={{ ml: 'auto' }}>
