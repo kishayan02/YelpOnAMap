@@ -5,7 +5,7 @@ import { DataGrid} from '@mui/x-data-grid';
 
 
 import SongCard from '../components/SongCard';
-// import RestaurantCard from '../components/RestaurantCard';
+import RestaurantCard from '../components/RestaurantCard';
 //import ShoppingCart from '../components/ShoppingCart';
 
 import {GiFastNoodles, GiNoodleBall, GiSushis, GiChickenLeg, GiTacos} from 'react-icons/gi';
@@ -25,7 +25,7 @@ export default function YelpstersPage() {
   const [userLat, setUserLat] = useState(queryParameters.get("latitude"));
   const [userLong, setUserLong] = useState(queryParameters.get("longitude"));
 
-  const [yelpsterData, setData] = useState([]);
+  const [yelpsterData, setYelpsterData] = useState([]);
   //FOR WHEN NO ACCES TO DATA or default
   if (userLat == null) {
     setUserLat(39.952305)
@@ -66,7 +66,7 @@ export default function YelpstersPage() {
 // Sets minimum number of stars for that restaurant
   const [stars, setStars] = useState([0, 5]);
   const [reviews, setReviews] = useState(500);
-  const [years, setYear] = useState(2004);
+  const [year, setYear] = useState(2005);
   const [fans, setFans] = useState(0);
   const [useful, setUseful] = useState(0);
 
@@ -84,37 +84,60 @@ export default function YelpstersPage() {
   //@EEEEE name -> restaurant
   const [name, setName] = useState('');
   
-
   
-  const searchRestaurants = () => {
-    fetch(`http://${config.server_host}:${config.server_port}/restaurant_search?minstars=${stars[0]}` +
-      `&minreviews=${reviews[0]}` + 
+  const searchYelpers = () => {
+    fetch(`http://${config.server_host}:${config.server_port}/influential_yelpsters_people?minstars=${stars[0]}` +
+      `&reviews=${reviews}` + 
       `&maxstars=${stars[1]}` + 
-      `&maxreviews=${reviews[1]}` + 
       `&eliteOnly=${eliteOnly}` +
-      `&restaurantName=${restaurantName}` +
-      `&latitude=${userLat}` + 
-      `&longitude=${userLong}` + 
-      `&dist=${distance}`
+      `&year=${year}` + 
+      `&fans=${fans}` + 
+      `&useful=${useful}`
     )
       .then(res => res.json())
-      .then(resJson => setData(resJson));
+      .then(resJson => setYelpsterData(resJson));
+  }
+
+  const searchYelpstersRestaurants = () => {
+    fetch(`http://${config.server_host}:${config.server_port}/getInfluentialRecommendations?minstars=${stars[0]}` +
+      `&reviews=${reviews}` + 
+      `&maxstars=${stars[1]}` + 
+      `&eliteOnly=${eliteOnly}` +
+      `&year=${year}` + 
+      `&fans=${fans}` + 
+      `&useful=${useful}`
+    )
+      .then(res => res.json())
+      .then(resJson => setRestaurantData(resJson));
   }
 
   useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/restaurant_search?minstars=${stars[0]}` +
-      `&minreviews=${reviews[0]}` + 
+    fetch(`http://${config.server_host}:${config.server_port}/influential_yelpsters_people?minstars=${stars[0]}` +
+      `&reviews=${reviews}` + 
       `&maxstars=${stars[1]}` + 
-      `&maxreviews=${reviews[1]}` + 
-      `&eliteOnly=${eliteOnly}` + 
-      `&restaurantName=${restaurantName}` +
-      `&latitude=${userLat}` + 
-      `&longitude=${userLong}` + 
-      `&dist=${distance}`
+      `&eliteOnly=${eliteOnly}` +
+      `&year=${year}` + 
+      `&fans=${fans}` + 
+      `&useful=${useful}`
     )
       .then(res => res.json())
-      .then(resJson => setData(resJson));
+      .then(resJson => setYelpsterData(resJson));
   }, []);
+
+  useEffect(() => {
+    fetch(`http://${config.server_host}:${config.server_port}/getInfluentialRecommendations?minstars=${stars[0]}` +
+      `&reviews=${reviews}` + 
+      `&maxstars=${stars[1]}` + 
+      `&eliteOnly=${eliteOnly}` +
+      `&year=${year}` + 
+      `&fans=${fans}` + 
+      `&useful=${useful}`
+    )
+      .then(res => res.json())
+      .then(resJson => setRestaurantData(resJson));
+  }, []);
+
+  
 
 
 
@@ -126,22 +149,25 @@ export default function YelpstersPage() {
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'average_stars', headerName: 'Average Star Rating', width: 200 },
     { field: 'review_count', headerName: 'Number of Reviews', width: 150 },
-    { field: 'yelping_since', headerName: "Yelping Since", width: 150},
+    { field: 'yelp_year', headerName: "Yelping Since", width: 150},
     { field: 'fans', headerName: 'Number of Fans', width: 150 },
     { field: 'useful', headerName: 'Useful Votes', wdith: 150}
   ]
 
   const restaurantColumns = [
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'stars', headerName: 'Star Rating', width: 200 },
-    { field: 'review_count', headerName: 'Number of Reviews', width: 150 },
-    { field: 'address', headerName: "Address", width: 150}
+    { field: 'name', headerName: 'Restaurant', width: 350, renderCell: (params) => (
+        <Link onClick={() => setSelectedRestaurantId(params.row.id)}>{params.value}</Link>
+    ) },
+    { field: 'stars', headerName: 'Star Rating', width: 100 },
+    { field: 'review_count', headerName: 'Elite Reviews', width: 100 },
+    { field: 'address', headerName: "Address", width: 400}
   ]
   
 
   const searchButtonClickChange = () => {
     //first create and set cuisine search
-    searchRestaurants()
+    searchYelpers();
+    searchYelpstersRestaurants();
     if (eliteOnly) {
       setEliteStarColumnName("Elite Stars")
       setEliteReviewColumnName("Elite Reviews")
@@ -161,13 +187,14 @@ export default function YelpstersPage() {
   // will automatically lay out all the grid items into rows based on their xs values.
   return (
       <Container>
+        {selectedRestaurantId && <RestaurantCard restaurantId={selectedRestaurantId} lat={userLat} longi={userLong} handleClose={() => setSelectedRestaurantId(null)} />}
       {/* {selectedRestaurantId && <RestaurantCard restaurantId={selectedRestaurantId} lat={userLat} longi={userLong} handleClose={() => setSelectedRestaurantId(null)} />} */}
       <h2>Search Yelpsters</h2>
       <Grid container spacing={6}>
         <Grid item xs={2}>
             <p>Yelping Since</p>
             <Slider
-              value={years}
+              value={year}
               min={2004}
               max={2023}
               step={1}
@@ -275,6 +302,8 @@ export default function YelpstersPage() {
           )
         }}
       />
+        <br></br>
+        <h2> </h2>
     </Container>
   );
 }

@@ -10,6 +10,7 @@ import SongsPage from './pages/SongsPage';
 import AlbumInfoPage from './pages/AlbumInfoPage'
 import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage';
 import RecommenderPage from './pages/RecommenderPage';
+import ReviewsPage from "./pages/ReviewsPage";
 import YelpstersPage from "./pages/YelpstersPage";
 
 // createTheme enables you to customize the look and feel of your app past the default
@@ -38,6 +39,10 @@ export default function App() {
           <Route path="/restaurantsearch" element={<SongsPage />} />
           <Route path="/nearby_restaurants" element={<NearbyRestaurantsPage />} />
           <Route path="/recommender" element={<RecommenderPage />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
+          <Route path="/restaurantsearch" element={<SongsPage />} />
+          <Route path="/nearby_restaurants" element={<NearbyRestaurantsPage />} />
           <Route path="/yelpsters" element={<YelpstersPage />} />
         </Routes>
       </BrowserRouter>

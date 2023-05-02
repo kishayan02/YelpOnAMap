@@ -1,5 +1,7 @@
-import { AppBar, Container, Toolbar, Typography } from '@mui/material'
+import { AppBar, Container, Toolbar, Typography, IconButton, Badge } from '@mui/material'
 import { NavLink } from 'react-router-dom';
+import { FaShoppingCart } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 
 // The hyperlinks in the NavBar contain a lot of repeated formatting code so a
 // helper component NavText local to the file is defined to prevent repeated code.
@@ -32,14 +34,30 @@ const NavText = ({ href, text, isMain }) => {
 // to make the component look nice. Feel free to try changing the formatting
 // props to how it changes the look of the component.
 export default function NavBar() {
+  const [cartItemsCount, setCartItemsCount] = useState(0);
+
+  useEffect(() => {
+    const cartItems = JSON.parse(sessionStorage.getItem("cart"));
+    if (cartItems) {
+      setCartItemsCount(cartItems.length);
+    }
+  }, []);
+
+  //TODO: CHANGE RECOMMENDER AND RANDOM FOR NEW LINKS
   return (
     <AppBar position='static'>
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <NavText href='/' text='RESTAURANT HUNTER' isMain />
-          <NavText href='/albums' text='ALBUMS' />
-          <NavText href='/restaurantsearch' text='SEARCH' />
-          <NavText href='/nearby_restaurants' text='NEARBY' />
+          <NavText href='/restaurantsearch' text='RESTAURANTS' />
+          <NavText href='/songs' text='RECOMMENDER' /> 
+          <NavText href='/songs' text='RANDOM!' />
+          <NavText href='/yelpsters' text="INFLUENTIAL YELPSTERS"/>
+          <Badge badgeContent={cartItemsCount} color='primary' sx={{ ml: 'auto' }}>
+            <IconButton as="a" href="/albums" edge="end" color="inherit" aria-label="shoppingcart" sx={{ ml: 'auto' }}>
+              <FaShoppingCart size={24} />
+            </IconButton>
+          </Badge>
         </Toolbar>
       </Container>
     </AppBar>

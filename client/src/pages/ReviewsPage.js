@@ -2,15 +2,20 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
 
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, gridClasses } from '@mui/x-data-grid';
 
 import SongCard from '../components/SongCard';
 import { formatDuration } from '../helpers/formatter';
 import { NavLink } from 'react-router-dom';
+//import { use } from '../../../server/server';
 
 const config = require('../config.json');
 
-export default function AlbumsPage() {
+export default function ReviewsPage() {
+
+  const queryParameters = new URLSearchParams(window.location.search);
+  const [restaurant_Id, setRestaurant_Id] = useState(queryParameters.get("restaurant_id"));
+  const [restaurant_Name, setRestaurant_Name] = useState(queryParameters.get("name"));
 
   //hook for the page size of the table
   const [pageSize, setPageSize] = useState(10);
@@ -30,30 +35,14 @@ export default function AlbumsPage() {
   //hook for setting what we want the average reviewer's min and max average star rating to be
   const [avgStars, setAvgStars] = useState([0, 5]);
 
-
+  const [restaurantName, setRestaurantName] = useState({});
 
   const [selectedSongId, setSelectedSongId] = useState(null);
-  const [albums, setAlbums] = useState([]);
 
   useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/albums`)
+    fetch(`http://${config.server_host}:${config.server_port}/restaurant_reviews_stare?restaurant_id=${restaurant_Id}`)
       .then(res => res.json())
-      .then(resJson => setAlbums(resJson));
-  }, []);
-
-  // flexFormat provides the formatting options for a "flexbox" layout that enables the album cards to
-  // be displayed side-by-side and wrap to the next line when the screen is too narrow. Flexboxes are
-  // incredibly powerful. You can learn more on MDN web docs linked below (or many other online resources)
-  // https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox
-  const flexFormat = { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' };
-
-  useEffect(() => {
-    // fetch(`http://${config.server_host}:${config.server_port}/search_songs`)
-    //   .then(res => res.json())
-    //   .then(resJson => {
-    //     const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
-    //     setData(songsWithId);
-    //   });
+      .then(resJson => setData(resJson));
   }, []);
 
   const search = () => {
@@ -74,21 +63,25 @@ export default function AlbumsPage() {
     //   });
   }
 
+  // flexFormat provides the formatting options for a "flexbox" layout that enables the album cards to
+  // be displayed side-by-side and wrap to the next line when the screen is too narrow. Flexboxes are
+  // incredibly powerful. You can learn more on MDN web docs linked below (or many other online resources)
+  // https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox
+  const flexFormat = { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' };
+
   const columns = [
-    { field: 'reviewername', headerName: 'Reviewer Name', width: 300, renderCell: (params) => (
-        <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
-    ) },
-    { field: 'review', headerName: 'Review', width: 350 },
-    { field: 'reviewerrating', headerName: 'Rating', width: 150 },
-    { field: 'elite', headerName: 'Elite?', width: 150 },
-    { field: 'avgreviewerstars', headerName: 'Avg. Reviewer Stars', width: 150 },
+    { field: 'name', headerName: 'Reviewer Name', width: 150},
+    { field: 'text', headerName: 'Review', width: 700 },
+    { field: 'stars', headerName: 'Rating', width: 100 },
+    { field: 'elite', headerName: 'Elite?', width: 75 },
+    { field: 'average_stars', headerName: 'Avg. Reviewer Stars', width: 100 },
   ]
 
   return (
     // TODO (TASK 22): replace the empty object {} in the Container's style property with flexFormat. Observe the change to the Albums page.
     // TODO (TASK 22): then uncomment the code to display the cover image and once again observe the change, i.e. what happens to the layout now that each album card has a fixed width?
     <Container>
-      <h2>Review Parameters: </h2>
+      <h1>Reviews for {restaurant_Name}</h1>
       <Grid container spacing={6}>
         <Grid item xs={8}>
           <p>Average Rating of Reviewer</p>
@@ -120,6 +113,12 @@ export default function AlbumsPage() {
         pageSize={pageSize}
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        getRowHeight={() => 'auto'}
+        sx={{
+            [`& .${gridClasses.cell}`]: {
+              py: 1,
+            },
+          }}
         autoHeight
       />
     </Container>
