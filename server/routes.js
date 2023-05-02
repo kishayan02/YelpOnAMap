@@ -540,9 +540,11 @@ const get_cart = async function(req, res) {
   // const page = req.query.page;
   //const pageSize = req.query.page_size ?? 10;
   const currId = req.query.id;
-
+  const latitude = req.query.lat ?? 39.952305;
+  const longitude = req.query.long  ?? -75.193703;
   connection.query(`
-  SELECT business_id as id, name, stars, review_count, city, CONCAT(address," ",city,", ",state, " ", postal_code) as address 
+  SELECT business_id as id, name, stars, review_count, city, CONCAT(address," ",city,", ",state, " ", postal_code) as address ,
+  ROUND(ST_Distance_Sphere(point(${longitude}, ${latitude}), point(longitude, latitude)) * 0.000621371, 2) as distance
   FROM Restaurants 
   WHERE business_id LIKE '%${currId}%'`
   , (err, data) => {
@@ -558,32 +560,6 @@ const get_cart = async function(req, res) {
       res.json(data);
     }
   });
-
-  // var q = `
-  //   SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address 
-  //   FROM Restaurants 
-  //   WHERE business_id = '${currId}' `;
-
-  // if (!page) {
-  //   connection.query(q, (err, data) => {
-  //     if (err || data.length === 0) {
-  //       console.log(err);
-  //       res.json([])
-  //     } else{
-  //       res.json(data);
-  //     }
-  //   });
-  // } else {
-  //   const offset = (page - 1) * pageSize; 
-  //   q += `LIMIT ${pageSize} OFFSET ${offset}\n`;
-  //   connection.query(q, (err, data) => {
-  //     if (err || data.length === 0) {
-  //       console.log(err);
-  //       res.json([])
-  //     } else{
-  //       res.json(data);
-  //     }
-  //   });
 }
 
 const random_reviewer = async function(req, res) {

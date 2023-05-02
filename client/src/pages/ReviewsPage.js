@@ -118,7 +118,7 @@ export default function ReviewsPage() {
         </Grid>
       </Grid>
         
-      <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+      <Button sx={{ border: 1 }} onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
       </Button>
       <h2>Results</h2>
@@ -137,6 +137,8 @@ export default function ReviewsPage() {
           }}
         autoHeight
       />
+      <br></br>
+      <h2> </h2>
     </Container>
   );
 }

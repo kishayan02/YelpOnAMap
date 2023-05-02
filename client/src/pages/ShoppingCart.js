@@ -23,6 +23,9 @@ export default function ShoppingCart() {
     //hook to store the data from the cart itself
     const [cartData, setCartData] = useState(JSON.parse(sessionStorage.getItem('cart')) || []);
 
+    const lat = sessionStorage.getItem("latitude") ?? 39.952305;
+    const long = sessionStorage.getItem("longitude") ?? -75.193703;
+
     var inCart = [];
     var cities = [];
 
@@ -32,7 +35,9 @@ export default function ShoppingCart() {
         for (let i = 0; i < cartData.length; i++) {
           if (cartData[i] != null) {
             fetch(`http://${config.server_host}:${config.server_port}/cart` +
-            `?id=${cartData[i]}`)
+            `?id=${cartData[i]}` + 
+            `&lat=${lat}` + 
+            `&long=${long}`)
               .then(res => res.json())
               .then(resJson => {setData(data => [...data, resJson[0]]); inCart.push(resJson[0]); cities.push(resJson[0].city)})
               .finally (() => {
@@ -57,12 +62,12 @@ export default function ShoppingCart() {
     }
 
     const cartColumns = [
-        { field: 'name', headerName: 'Name', width: 250/*, renderCell: (params) => (
+        { field: 'name', headerName: 'Name', width: 300/*, renderCell: (params) => (
             <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
         ) */},
-        { field: 'stars', headerName: 'Stars', width: 100 },
-        { field: 'distance', headerName: 'Distance', width: 100 },
-        { field: 'address', headerName: 'Address', width: 300 },
+        { field: 'stars', headerName: 'Stars', width: 150 },
+        { field: 'distance', headerName: 'Distance (mi)', width: 150 },
+        { field: 'address', headerName: 'Address', width: 350 },
         { field: 'removefromcart', headerName: 'Remove from Cart', width: 200, 
             renderCell: (params) => {
             return (
@@ -85,12 +90,12 @@ export default function ShoppingCart() {
     ]
 
     const recColumns = [
-      { field: 'name', headerName: 'Name', width: 250/*, renderCell: (params) => (
+      { field: 'name', headerName: 'Name', width: 350, align:"left"/*, renderCell: (params) => (
           <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
       ) */},
-      { field: 'stars', headerName: 'Stars', width: 100 },
-      { field: 'review_count', headerName: 'Review Count', width: 100 },
-      { field: 'address', headerName: 'Address', width: 300 },
+      { field: 'stars', headerName: 'Stars', width: 175, align:"left"},
+      { field: 'review_count', headerName: 'Review Count', width: 175, align:"left" },
+      { field: 'address', headerName: 'Address', width: 450 },
   ]
     
     const rows = inCart.map((t) => {
@@ -106,7 +111,7 @@ export default function ShoppingCart() {
     }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <Container>
         <h2>Cart</h2>
 
         <DataGrid 
@@ -124,8 +129,8 @@ export default function ShoppingCart() {
             )
           }}       
         />
-
-        <Button color="primary" onClick={() => generateRecommendations() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+        <br></br>
+        <Button sx={{ border: 1 }} color="primary" onClick={() => generateRecommendations() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
           Generate Recommendations
         </Button>
 
@@ -143,6 +148,6 @@ export default function ShoppingCart() {
             )
           }}
         />
-      </div>
+      </Container>
     )
 }

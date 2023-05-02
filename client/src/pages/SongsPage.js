@@ -149,15 +149,14 @@ export default function SongsPage() {
   // LazyTable component. The big difference is we provide all data to the DataGrid component
   // instead of loading only the data we need (which is necessary in order to be able to sort by column)
   const columns = [
-    { field: 'name', headerName: 'Restaurant', width: 250, renderCell: (params) => (
+    { field: 'name', headerName: 'Restaurant', width: 300, renderCell: (params) => (
       <Link onClick={() => setSelectedRestaurantId(params.row.id)}>{params.value}</Link>
   ) },
-    { field: 'stars', headerName: eliteStarColumnName, width: 100 },
-    { field: 'review_count', headerName: eliteReviewColumnName , width: 100 },
-    { field: 'distance', headerName: "Distance (mi)", width : 100},
-    { field: 'address', headerName: "Address", width: 300},
-    { field: 'cuisine', headerName: 'Cuisine', width: 100 },
-    { field: 'addtocart', headerName: 'Add to Cart', width: 100, 
+    { field: 'stars', headerName: eliteStarColumnName, width: 125 },
+    { field: 'review_count', headerName: eliteReviewColumnName , width: 125 },
+    { field: 'distance', headerName: "Distance (mi)", width : 125},
+    { field: 'address', headerName: "Address", width: 350},
+    { field: 'addtocart', headerName: 'Add to Cart', width: 125, 
       renderCell: (params) => {
         return (
           <strong>
@@ -387,7 +386,7 @@ export default function SongsPage() {
         
         {/* TODO (TASK 24): add sliders for danceability, energy, and valence (they should be all in the same row of the Grid) */}
         {/* Hint: consider what value xs should be to make them fit on the same row. Set max, min, and a reasonable step. Is valueLabelFormat is necessary? */}
-      <Button color="primary" onClick={() => searchButtonClickChange() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+      <Button  sx={{ border: 1 }} color="primary" onClick={() => searchButtonClickChange() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
       </Button>
       <h2>Results</h2>
@@ -408,7 +407,8 @@ export default function SongsPage() {
         }}
       />
 
-      <NavLink to={`/albums`}>THIS IS THE TEMPORARY SHOPPING CART</NavLink>
+<br></br>
+        <h2> </h2>
     </Container>
   );
 }

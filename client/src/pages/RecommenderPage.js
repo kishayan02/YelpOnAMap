@@ -478,7 +478,6 @@ newMap.on('click', function (evt) {
               min={0}
               max={3000}
               step={10}
-              marks
               onChange={(e, newValue) => setDistance(newValue)}
               valueLabelDisplay='auto'
               valueLabelFormat={value => <div>{value + " miles"}</div>}
@@ -580,9 +579,10 @@ newMap.on('click', function (evt) {
           />
         </Grid> */}
       </Grid>
-      <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+      <Button sx={{ border: 1 }} onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
       </Button>
+      <br></br>
       <div id='map' style={{ height: 500, width: '100%' }}><div id="popup"></div></div>
       <script src="https://cdn.jsdelivr.net/npm/elm-pep@1.0.6/dist/elm-pep.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -596,7 +596,8 @@ newMap.on('click', function (evt) {
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         autoHeight
       />
-      
+      <br></br>
+        <h2> </h2>
       {/* <div>{data && <MapComponent data={data}/>} </div> */}
     </Container>
   );

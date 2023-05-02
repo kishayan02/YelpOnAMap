@@ -146,20 +146,20 @@ export default function YelpstersPage() {
   // LazyTable component. The big difference is we provide all data to the DataGrid component
   // instead of loading only the data we need (which is necessary in order to be able to sort by column)
   const columns = [
-    { field: 'name', headerName: 'Name', width: 200 },
+    { field: 'name', headerName: 'Name', width: 250 },
     { field: 'average_stars', headerName: 'Average Star Rating', width: 200 },
-    { field: 'review_count', headerName: 'Number of Reviews', width: 150 },
-    { field: 'yelp_year', headerName: "Yelping Since", width: 150},
-    { field: 'fans', headerName: 'Number of Fans', width: 150 },
-    { field: 'useful', headerName: 'Useful Votes', wdith: 150}
+    { field: 'review_count', headerName: 'Number of Reviews', width: 175 },
+    { field: 'yelp_year', headerName: "Yelping Since", width: 175},
+    { field: 'fans', headerName: 'Number of Fans', width: 175 },
+    { field: 'useful', headerName: 'Useful Votes', wdith: 175}
   ]
 
   const restaurantColumns = [
     { field: 'name', headerName: 'Restaurant', width: 350, renderCell: (params) => (
         <Link onClick={() => setSelectedRestaurantId(params.row.id)}>{params.value}</Link>
     ) },
-    { field: 'stars', headerName: 'Star Rating', width: 100 },
-    { field: 'review_count', headerName: 'Elite Reviews', width: 100 },
+    { field: 'stars', headerName: 'Star Rating', width: 175 },
+    { field: 'review_count', headerName: 'Elite Reviews', width: 175 },
     { field: 'address', headerName: "Address", width: 400}
   ]
   
@@ -265,7 +265,7 @@ export default function YelpstersPage() {
         
         {/* TODO (TASK 24): add sliders for danceability, energy, and valence (they should be all in the same row of the Grid) */}
         {/* Hint: consider what value xs should be to make them fit on the same row. Set max, min, and a reasonable step. Is valueLabelFormat is necessary? */}
-      <Button color="primary" onClick={() => searchButtonClickChange() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+      <Button sx={{ border: 1 }} color="primary" onClick={() => searchButtonClickChange() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
       </Button>
       <h2>Results</h2>

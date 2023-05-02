@@ -105,15 +105,15 @@ export default function RestaurantCard({ restaurantId, lat, longi, handleClose }
                 }}
             />
         </div>
-        <Button>
+        <Button sx={{ border: 1 }}>
           <NavLink to={`/reviews?restaurant_id=${restaurantData.id}&name=${restaurantData.name}`}>
             More Reviews
             </NavLink>
           </Button>
-        <Button onClick={handleAddToCart} style={{ left: '50%', transform: 'translateX(-50%)' }} >
+        <Button sx={{ border: 1 }} onClick={handleAddToCart} style={{ left: '50%', transform: 'translateX(-50%)' }} >
           Add to Cart
         </Button>
-        <Button onClick={handleClose} style={{ left: '50%', transform: 'translateX(-50%)' }} >
+        <Button sx={{ border: 1 }} onClick={handleClose} style={{ left: '50%', transform: 'translateX(-50%)' }} >
           Close
         </Button>
       </Box>

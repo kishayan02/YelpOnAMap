@@ -1,7 +1,8 @@
-import { AppBar, Container, Toolbar, Typography, IconButton, Badge } from '@mui/material'
+import { AppBar, Container, Toolbar, Typography, IconButton, Badge, Button } from '@mui/material'
 import { NavLink } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import MenuIcon from '@mui/icons-material/Menu';
 
 // The hyperlinks in the NavBar contain a lot of repeated formatting code so a
 // helper component NavText local to the file is defined to prevent repeated code.

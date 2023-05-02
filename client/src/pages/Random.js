@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Container, Box, Grid, Slider, TextField, Input} from '@mui/material';
+import { Button, Container, Box, Grid, Slider, TextField, Input, Typography} from '@mui/material';
 import { Form, NavLink } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
@@ -91,21 +91,27 @@ export default function RandomRestaurant() {
           />
           </Grid>
         </Grid>
-        <Button color="primary" onClick={() => generateRandomRestaurant() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+        <Button sx={{ border: 1 }} color="primary" onClick={() => generateRandomRestaurant() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
           Generate Restaurant
         </Button>
         <h2>Results</h2>
         {<Box component="span" sx={{ p: 2, border: '1px black' }}>
-            <h3> Name: {restaurantData.name} </h3>
+            <h3> Name:  {restaurantData.name}</h3>
             <h3> Address: {restaurantData.address} </h3>
             <h3> Stars: {restaurantData.stars} stars </h3>
-            <NavLink to="/albums">
-                See this restaurant's reviews!
-            </NavLink>
-            <Button onClick={addToCart}>
-                Add this restaurant to your cart!
+        </Box>}    
+        <Box  justifyContent="center" alignItems="center" display="flex">
+        <NavLink to="/albums">
+                <Button sx={{ border: 1 }}> 
+                See Reviews
             </Button>
-        </Box>}
+            </NavLink>
+            <Button onClick={addToCart } sx={{ border: 1 }}>
+                Add to Cart
+            </Button>
+        </Box>
+            
+        
 
         <p style={{fontSize: 30}}> Generate a Random Reviewer! </p>
         <Grid item xs={3}>
@@ -135,12 +141,13 @@ export default function RandomRestaurant() {
           />
           </Grid>
         </Grid>
-        <Button color="primary" onClick={() => generateRandomReviewer() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+        <Button sx={{ border: 1 }} color="primary" onClick={() => generateRandomReviewer() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
           Generate Reviewer
         </Button>
         <h2>Results</h2>
         {<Box component="span" sx={{ p: 2, border: '1px black' }}>
-            <h3> Name: {reviewerData.name} </h3>
+            <h3> Name:  </h3>
+            <p>{reviewerData.name}</p>
             <h3> Review Count: {reviewerData.review_count} </h3>
             <h3> Average Stars: {reviewerData.average_stars} stars </h3>
         </Box>}

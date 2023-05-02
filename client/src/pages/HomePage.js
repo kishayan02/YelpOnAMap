@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Container, Divider, Link, Box} from '@mui/material';
+import { Button, Container, Divider, Link, Box, Typography} from '@mui/material';
 import { Form, NavLink } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
@@ -133,28 +133,56 @@ export default function HomePage() {
 
   return (
     <Container>
-      <p style={{fontSize: 30}}> Welcome to Restaurant Hunter! Here, we aim to provide you the best places to eat according to either your or a planned location!</p>
+      <br></br>
+      <Typography variant="h2" component="h2" align="center" >
+      Welcome to Restaurant Hunter!
+     </Typography>
+     <br></br>
+     <Typography variant="h3" component="h3" align="center">
+     By entering your coordinates, we'll provide you with the best places to eat!
+     </Typography>
+     <br></br>
+     <br></br>
 
-      <h2> Use my location: </h2>
-      <Button
-        onClick={() => personalLocationButtonHandler()} background-color={lightBlue} border-radius={5}> 
-        Find your coordinates! 
+     <Typography variant="h4" component="h4" align="center">
+     <Button 
+        onClick={() => personalLocationButtonHandler()} background-color={lightBlue} border-radius={5} sx={{ border: 1 }}> 
+        <Typography variant="h2" component="h2" align="center">
+        Use My Location
+      </Typography>
       </Button>
-      <p> {searchStatus} </p>
+     </Typography>
+     <br></br>
+     <Typography variant="h5" component="h5" align="center">
+        {searchStatus}
+     </Typography>
+     <br></br>
       <Divider />
-      <h2> Enter another location's coordinates: </h2>
-      <form>
+      <br></br>
+      <Typography variant="h3" component="h3" align="center">
+      Enter another location's coordinates:
+     </Typography>
+     <br></br>
+      <form align="center">
         <div className="form-control"> 
-          <label>Latitude</label>
+          <label><Typography variant="h5" component="h5" align="center">
+          Latitude
+     </Typography></label>
           <input type="number" name="latitude" {...register("latitude", {required: true})} />
         </div>
+        <br></br>
         <div className="form-control"> 
-          <label>Longitude</label>
+          <label><Typography variant="h5" component="h5" align="center">
+          Longitude
+     </Typography></label>
           <input type="number" name="longitude" {...register("longitude", {required: true})} />
         </div>
-        <Button
+        <br></br>
+        <Button sx={{ border: 1 }}
           onClick={() => anyLocationButtonHandler()} background-color={lightBlue} border-radius={5}> 
-          Submit 
+          <Typography variant="h5" component="h5" align="center">
+          Submit
+     </Typography> 
         </Button>
       </form>
 
