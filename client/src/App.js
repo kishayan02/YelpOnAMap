@@ -9,7 +9,8 @@ import AlbumsPage from './pages/AlbumsPage';
 import SongsPage from './pages/SongsPage';
 import AlbumInfoPage from './pages/AlbumInfoPage';
 import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage';
-import RandomRestaurant from './pages/RandomRestaurant';
+import Random from './pages/Random';
+import Cart from './pages/ShoppingCart';
 
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
@@ -36,7 +37,8 @@ export default function App() {
           <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
           <Route path="/restaurant_search" element={<SongsPage />} />
           <Route path="/nearby_restaurants" element={<NearbyRestaurantsPage />} />
-          <Route path="/random_restaurant" element={<RandomRestaurant />} />
+          <Route path="/random" element={<Random />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

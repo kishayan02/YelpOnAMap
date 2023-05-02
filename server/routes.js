@@ -292,11 +292,12 @@ const search_restaurants = async function(req, res) {
 const random_restaurant = async function(req, res) {
   // default is Philly and 5 miles
   const lat = req.query.latitude ?? 39.9526;
-  const long = req.query.longitude ?? 75.1652;
+  const long = req.query.longitude ?? -75.1652;
   const maxDistance = req.query.dist ?? 5;
   connection.query(`
   SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address
   FROM Restaurants 
+  WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
   ORDER BY RAND()
   LIMIT 1`
   , (err, data) => {
@@ -314,68 +315,110 @@ const random_restaurant = async function(req, res) {
   });
 }
 
-// // Route 4: GET /album/:album_id
-// const album = async function(req, res) {
-//   // TODO (TASK 5): implement a route that given a album_id, returns all information about the album
-//   res.json({}); // replace this with your implementation
-// }
+const get_cart = async function(req, res) {
+  // const page = req.query.page;
+  //const pageSize = req.query.page_size ?? 10;
+  const currId = req.query.id;
 
-// // Route 5: GET /albums
-// const albums = async function(req, res) {
-//   // TODO (TASK 6): implement a route that returns all albums ordered by release date (descending)
-//   // Note that in this case you will need to return multiple albums, so you will need to return an array of objects
-//   res.json([]); // replace this with your implementation
-// }
+  connection.query(`
+  SELECT business_id as id, name, stars, review_count, city, CONCAT(address," ",city,", ",state, " ", postal_code) as address 
+  FROM Restaurants 
+  WHERE business_id LIKE '%${currId}%'`
+  , (err, data) => {
+    //   WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      res.send("error");
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data);
+    }
+  });
 
-// // Route 6: GET /album_songs/:album_id
-// const album_songs = async function(req, res) {
-//   // TODO (TASK 7): implement a route that given an album_id, returns all songs on that album ordered by track number (ascending)
-//   res.json([]); // replace this with your implementation
-// }
+  // var q = `
+  //   SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address 
+  //   FROM Restaurants 
+  //   WHERE business_id = '${currId}' `;
 
-// /************************
-//  * ADVANCED INFO ROUTES *
-//  ************************/
+  // if (!page) {
+  //   connection.query(q, (err, data) => {
+  //     if (err || data.length === 0) {
+  //       console.log(err);
+  //       res.json([])
+  //     } else{
+  //       res.json(data);
+  //     }
+  //   });
+  // } else {
+  //   const offset = (page - 1) * pageSize; 
+  //   q += `LIMIT ${pageSize} OFFSET ${offset}\n`;
+  //   connection.query(q, (err, data) => {
+  //     if (err || data.length === 0) {
+  //       console.log(err);
+  //       res.json([])
+  //     } else{
+  //       res.json(data);
+  //     }
+  //   });
+}
 
-// // Route 7: GET /top_songs
-// const top_songs = async function(req, res) {
-//   const page = req.query.page;
-//   // TODO (TASK 8): use the ternary (or nullish) operator to set the pageSize based on the query or default to 10
-//   const pageSize = undefined;
+const random_reviewer = async function(req, res) {
+  const minReviewCount = req.query.review_count ?? 10;
+  connection.query(`
+  SELECT user_id as id, name, review_count, average_stars
+  FROM Users 
+  WHERE review_count >= ${minReviewCount}
+  ORDER BY RAND()
+  LIMIT 1`
+  , (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data);
+    }
+  });
+}
 
-//   if (!page) {
-//     // TODO (TASK 9)): query the database and return all songs ordered by number of plays (descending)
-//     // Hint: you will need to use a JOIN to get the album title as well
-//     res.json([]); // replace this with your implementation
-//   } else {
-//     // TODO (TASK 10): reimplement TASK 9 with pagination
-//     // Hint: use LIMIT and OFFSET (see https://www.w3schools.com/php/php_mysql_select_limit.asp)
-//     res.json([]); // replace this with your implementation
-//   }
-// }
-
-// // Route 8: GET /top_albums
-// const top_albums = async function(req, res) {
-//   // TODO (TASK 11): return the top albums ordered by aggregate number of plays of all songs on the album (descending), with optional pagination (as in route 7)
-//   // Hint: you will need to use a JOIN and aggregation to get the total plays of songs in an album
-//   res.json([]); // replace this with your implementation
-// }
-
-// // Route 9: GET /search_albums
-// const search_songs = async function(req, res) {
-//   // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
-//   // Some default parameters have been provided for you, but you will need to fill in the rest
-//   const title = req.query.title ?? '';
-//   const durationLow = req.query.duration_low ?? 60;
-//   const durationHigh = req.query.duration_high ?? 660;
-
-//   res.json([]); // replace this with your implementation
-// }
+const cart_recommend = async function(req, res) {
+  const chosenCity = req.query.city;
+  connection.query(`
+  WITH elite_users AS
+  (SELECT user_id
+    FROM Users
+    WHERE elite IS NOT null)
+  SELECT DISTINCT R.business_id as id, name, R.stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address
+  FROM Reviews S JOIN elite_users E ON E.user_id = S.user_id
+      JOIN Restaurants R ON S.business_id = R.business_id
+  WHERE city LIKE '%${chosenCity}%'
+  ORDER BY R.stars DESC
+  LIMIT 5;`
+  , (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data);
+    }
+  });
+}
 
 module.exports = {
   hello,
   random,
   nearby_restaurants,
   search_restaurants,
-  random_restaurant
+  random_restaurant,
+  get_cart,
+  random_reviewer,
+  cart_recommend
 }

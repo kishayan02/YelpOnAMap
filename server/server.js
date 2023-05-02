@@ -12,10 +12,12 @@ app.use(cors({
 // provide their handlers that we implemented in routes.js
 
 app.get('/', routes.hello);
-app.get('/random', routes.random);
 app.get('/nearby_restaurants', routes.nearby_restaurants)
 app.get('/restaurant_search', routes.search_restaurants)
 app.get('/random_restaurant', routes.random_restaurant)
+app.get('/cart', routes.get_cart)
+app.get('/random_reviewer', routes.random_reviewer)
+app.get('/cart_recommend', routes.cart_recommend)
 
 app.listen(config.server_port, () => {
   console.log(`Server running at http://${config.server_host}:${config.server_port}/`)

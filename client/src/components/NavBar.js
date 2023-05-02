@@ -34,7 +34,7 @@ const NavText = ({ href, text, isMain }) => {
 // to make the component look nice. Feel free to try changing the formatting
 // props to how it changes the look of the component.
 export default function NavBar() {
-  const [cartItemsCount, setCartItemsCount] = useState(5);
+  const [cartItemsCount, setCartItemsCount] = useState(0);
 
   useEffect(() => {
     const cartItems = JSON.parse(localStorage.getItem("cartItems"));
@@ -51,9 +51,9 @@ export default function NavBar() {
           <NavText href='/' text='RESTAURANT HUNTER' isMain />
           <NavText href='/restaurant_search' text='RESTAURANTS' />
           <NavText href='/songs' text='RECOMMENDER' /> 
-          <NavText href='/random_restaurant' text='RANDOM!' />
+          <NavText href='/random' text='RANDOM!' />
           <Badge badgeContent={cartItemsCount} color='primary' sx={{ ml: 'auto' }}>
-            <IconButton as="a" href="/albums" edge="end" color="inherit" aria-label="shoppingcart" sx={{ ml: 'auto' }}>
+            <IconButton as="a" href="/cart" edge="end" color="inherit" aria-label="shoppingcart" sx={{ ml: 'auto' }}>
               <FaShoppingCart size={24} />
             </IconButton>
           </Badge>
