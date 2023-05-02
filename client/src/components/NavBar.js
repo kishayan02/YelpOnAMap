@@ -12,7 +12,7 @@ const NavText = ({ href, text, isMain }) => {
       noWrap
       style={{
         marginRight: '30px',
-        fontFamily: 'monospace',
+        fontFamily: 'ui-rounded',
         fontWeight: 700,
         letterSpacing: '.3rem',
       }}
