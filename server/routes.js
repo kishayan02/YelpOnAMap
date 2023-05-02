@@ -388,6 +388,51 @@ LIMIT 10
   });
 }
 
+const recommender = async function(req, res) {
+  const cuisine = req.query.cuisine ?? '';
+  const minStars = req.query.minStars ?? 0;
+  const minReviews = req.query.minReviews ?? 0;
+  const distance = req.query.distance ?? 3000;
+  const lat = req.query.lat ?? 39.952305;
+  const long = req.query.long ?? -75.193703;
+
+  // Here is a complete example of how to query the database in JavaScript.
+  // Only a small change (unrelated to querying) is required for TASK 3 in this route.
+  connection.query(`
+    WITH top_postal AS (
+      SELECT postal_code
+      FROM Restaurants
+      WHERE categories LIKE '%${cuisine}%' AND
+        stars >= ${minStars} AND review_count >= ${minReviews}
+        AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${distance}
+      GROUP BY postal_code
+      ORDER BY COUNT(name) DESC
+      LIMIT 1
+    )
+    SELECT business_id, name, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, stars, latitude, longitude, review_count,
+      ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+    FROM Restaurants
+    WHERE postal_code = (SELECT postal_code FROM top_postal) 
+      AND categories LIKE '%${cuisine}%' AND
+      stars >= ${minStars} AND review_count >= ${minReviews}
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      res.json([]);
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// // Route 4: GET /album/:album_id
+// const album = async function(req, res) {
+//   // TODO (TASK 5): implement a route that given a album_id, returns all information about the album
+//   res.json({}); // replace this with your implementation
+// }
+
 const restaurant_get_name_from_id = async function(req, res) {
   console.log("getting - info name");
   const business_id = req.query.restaurant_id;
@@ -580,6 +625,7 @@ module.exports = {
   random,
   nearby_restaurants,
   search_restaurants,
+  recommender,
   restaurant_info,
   restaurant_reviews_peek,
   restaurant_reviews_stare,

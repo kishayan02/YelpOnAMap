@@ -8,7 +8,8 @@ import HomePage from './pages/HomePage';
 import AlbumsPage from './pages/AlbumsPage';
 import SongsPage from './pages/SongsPage';
 import AlbumInfoPage from './pages/AlbumInfoPage'
-import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage'
+import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage';
+import RecommenderPage from './pages/RecommenderPage';
 import ReviewsPage from "./pages/ReviewsPage";
 import YelpstersPage from "./pages/YelpstersPage";
 
@@ -33,6 +34,11 @@ export default function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/albums" element={<AlbumsPage />} />
+          {/* <Route path="/albums/:album_id" element={<AlbumInfoPage />} /> */}
+          <Route path="/restaurantsearch" element={<SongsPage />} />
+          <Route path="/nearby_restaurants" element={<NearbyRestaurantsPage />} />
+          <Route path="/recommender" element={<RecommenderPage />} />
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
           <Route path="/restaurantsearch" element={<SongsPage />} />
