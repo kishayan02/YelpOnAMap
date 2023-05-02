@@ -18,6 +18,7 @@ import Overlay from 'ol/Overlay.js';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import * as bootstrap from 'bootstrap';
 
+import RestaurantCard from '../components/RestaurantCard';
 import SongCard from '../components/SongCard';
 import { formatDuration } from '../helpers/formatter';
 const config = require('../config.json');
@@ -166,6 +167,7 @@ export default function RecommenderPage() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
   const [selectedSongId, setSelectedSongId] = useState(null);
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   
   const [cuisine, setCuisine] = useState('');
   const mapRef = useRef(null);
@@ -432,7 +434,7 @@ newMap.on('click', function (evt) {
   // instead of loading only the data we need (which is necessary in order to be able to sort by column)
   const columns = [
     { field: 'name', headerName: 'Name', width: 300, renderCell: (params) => (
-        <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
+      <Link onClick={() => setSelectedRestaurantId(params.row.id)}>{params.value}</Link>
     ) },
     // { field: 'cuisine', headerName: 'Cuisine', width: 300},
     { field: 'address', headerName: 'Address', width: 500},
@@ -461,7 +463,8 @@ newMap.on('click', function (evt) {
   // will automatically lay out all the grid items into rows based on their xs values.
   return (
     <Container>
-      {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
+      {/* {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />} */}
+      {selectedRestaurantId && <RestaurantCard restaurantId={selectedRestaurantId} lat={lat} longi={long} handleClose={() => setSelectedRestaurantId(null)} />}
       <h2>Recommender</h2>
       
       <Grid container spacing={6}>
