@@ -287,8 +287,31 @@ const search_restaurants = async function(req, res) {
     });
     }
   }
-  
-  
+}
+
+const random_restaurant = async function(req, res) {
+  // default is Philly and 5 miles
+  const lat = req.query.latitude ?? 39.9526;
+  const long = req.query.longitude ?? 75.1652;
+  const maxDistance = req.query.dist ?? 5;
+  connection.query(`
+  SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address
+  FROM Restaurants 
+  ORDER BY RAND()
+  LIMIT 1`
+  , (err, data) => {
+    //   WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      res.send("error");
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data);
+    }
+  });
 }
 
 // // Route 4: GET /album/:album_id
@@ -353,5 +376,6 @@ module.exports = {
   hello,
   random,
   nearby_restaurants,
-  search_restaurants
+  search_restaurants,
+  random_restaurant
 }

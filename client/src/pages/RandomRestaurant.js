@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Container, Divider, Link, Box } from '@mui/material';
+import { Button, Container, Box, Grid, Slider, TextField, Input} from '@mui/material';
 import { Form, NavLink } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
@@ -11,63 +11,91 @@ const config = require('../config.json');
 
 export default function RandomRestaurant() {
 
-    const [restaurant, setRestaurant] = useState();
+  const [restaurantName, setRestaurantName] = useState('');
+  const [restaurantData, setRestaurantData] = useState([]);    
+  // const [userLat, setUserLat] = useState(queryParameters.get("latitude"));
+  // const [userLong, setUserLong] = useState(queryParameters.get("longitude"));
+  const [userLat, setUserLat] = useState('');
+  const [userLong, setUserLong] = useState('');
+  const [distance, setDistance] = useState(5);
+  const [distanceV, setDistanceV] = useState([0, 50]);
+  
+  if (userLat == null) {
+    setUserLat(39.952305)
+  }
+  if (userLong == null) {
+    setUserLong(-75.193703)
+  }
 
-    const [selectedRestaurant, setSelectedRestaurant] = useState({});
+  const generateRandom = () => {
+    fetch(`http://${config.server_host}:${config.server_port}/random_restaurant`)
+      .then(res => res.json())
+      .then(resJson => setRestaurantData(resJson));
+    console.log(restaurantData);
+  }
 
-    useEffect(() => {
-        // fetch(`http://${config.server_host}:${config.server_port}/search_songs`)
-        //   .then(res => res.json())
-        //   .then(resJson => {
-        //     const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
-        //     setData(songsWithId);
-        //   });
-      }, []);
-    
-      const search = () => {
-        // fetch(`http://${config.server_host}:${config.server_port}/search_songs?name=${name}` +
-        //   `&duration_low=${duration[0]}&duration_high=${duration[1]}` +
-        //   `&plays_low=${plays[0]}&plays_high=${plays[1]}` +
-        //   `&danceability_low=${danceability[0]}&danceability_high=${danceability[1]}` +
-        //   `&energy_low=${energy[0]}&energy_high=${energy[1]}` +
-        //   `&valence_low=${valence[0]}&valence_high=${valence[1]}` +
-        //   `&explicit=${explicit}`
-        // )
-        //   .then(res => res.json())
-        //   .then(resJson => {
-        //     // DataGrid expects an array of objects with a unique id.
-        //     // To accomplish this, we use a map with spread syntax (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
-        //     const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
-        //     setData(songsWithId);
-        //   });
-      }
+  useEffect(() => {
+    fetch(`http://${config.server_host}:${config.server_port}/random_restaurant`)
+      .then(res => res.json())
+      .then(resJson => setRestaurantData(resJson));
+  }, []);
 
-      const addToCart = () => {
-        let currCart = JSON.parse(sessionStorage.getItem('cart')) || [];
-        currCart.push(restaurant[0].id);
-        sessionStorage.setItem('cart', JSON.stringify(currCart));
-      }
+  const generateRandomClickChange = () => {
+    generateRandom()
+  }
 
-      return (
-        <Container>
-            {selectedRestaurant && <SongCard restaurantId={selectedRestaurant} handleClose={() => setSelectedRestaurant(null)} />}
-            <Box component="span" sx={{ p: 5, border: '1px black' }}>
-                <div>
-                    <Link onClick={() => setSelectedRestaurant(restaurant[0].id)}>
-                        {restaurant[0].name}
-                    </Link>
-                </div>
-                <h3> Address: {restaurant[0].address} </h3>
-                <h3> Stars: {restaurant[0].stars} stars </h3>
-                <h3> Cuisine: {restaurant[0].cuisine} </h3>
-                <h3> Distance: {restaurant[0].distance} miles away </h3>
-                <NavLink to="/albums">
-                    See this restaurant's reviews!
-                </NavLink>
-                <Button onClick={addToCart}>
-                    Add this restaurant to your cart!
-                </Button>
-            </Box>
-        </Container>
-      )
+  const addToCart = () => {
+    let currCart = JSON.parse(sessionStorage.getItem('cart')) || [];
+    currCart.push(restaurantData[0].id);
+    sessionStorage.setItem('cart', JSON.stringify(currCart));
+  }
+
+  // {restaurant && <SongCard restaurantId={restaurant} handleClose={() => setRestaurant(null)} />}
+  return (
+    <Container>
+        <p style={{fontSize: 30}}> Generate a Random Restaurant! </p>
+        <Grid item xs={3}>
+          <p>Max Distance</p>
+          <Slider
+            value={typeof distance === 'number' ? distance : 0}
+            min={0}
+            max={50}
+            step={5}
+            onChange={(e, newValue) => setDistance(newValue)}
+            valueLabelDisplay='auto'
+            valueLabelFormat={value => <div>{value + " miles"}</div>}
+          />
+          <Grid item>
+          <Input
+            value={distance}
+            size="small"
+            onChange={(e, newValue) => setDistance(e.target.value === '' ? '' : Number(e.target.value))}
+            /*onBlur={handleBlur}*/
+            inputProps={{
+              step: 5,
+              min: 0,
+              max: 50,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            }}
+          />
+          </Grid>
+        </Grid>
+        <Button color="primary" onClick={() => generateRandomClickChange() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+          Generate
+        </Button>
+        <h2>Results</h2>
+        {<Box component="span" sx={{ p: 5, border: '1px black' }}>
+            <h3> Name: {restaurantData.name} </h3>
+            <h3> Address: {restaurantData.address} </h3>
+            <h3> Stars: {restaurantData.stars} stars </h3>
+            <NavLink to="/albums">
+                See this restaurant's reviews!
+            </NavLink>
+            <Button onClick={addToCart}>
+                Add this restaurant to your cart!
+            </Button>
+        </Box>}
+    </Container>
+  )
 }
