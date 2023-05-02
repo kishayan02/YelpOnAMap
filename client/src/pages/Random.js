@@ -22,10 +22,13 @@ export default function RandomRestaurant() {
   const [minReviews, setMinReviews] = useState(10);
   
   if (userLat == null) {
-    setUserLat(39.952305)
+    //setUserLat(39.952305)
+    setUserLat(sessionStorage.getItem("latitude"));
   }
+
   if (userLong == null) {
-    setUserLong(-75.193703)
+    //setUserLong(-75.193703)
+    setUserLong(sessionStorage.getItem("longitude"));
   }
 
   const generateRandomRestaurant = () => {
@@ -54,9 +57,9 @@ export default function RandomRestaurant() {
   //     // console.log(restaurantData);
   // }, []);
 
-  const addToCart = () => {
+  const addToCart = (e) => {
     let currCart = JSON.parse(sessionStorage.getItem('cart')) || [];
-    currCart.push(restaurantData[0].id);
+    currCart.push(e);
     sessionStorage.setItem('cart', JSON.stringify(currCart));
   }
 
@@ -102,7 +105,7 @@ export default function RandomRestaurant() {
             <NavLink to="/albums">
                 See this restaurant's reviews!
             </NavLink>
-            <Button onClick={addToCart}>
+            <Button onClick={addToCart(restaurantData.id)}>
                 Add this restaurant to your cart!
             </Button>
         </Box>}
