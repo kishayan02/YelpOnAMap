@@ -37,7 +37,7 @@ export default function NavBar() {
   const [cartItemsCount, setCartItemsCount] = useState(0);
 
   useEffect(() => {
-    const cartItems = JSON.parse(localStorage.getItem("cartItems"));
+    const cartItems = JSON.parse(sessionStorage.getItem("cart"));
     if (cartItems) {
       setCartItemsCount(cartItems.length);
     }
@@ -52,6 +52,10 @@ export default function NavBar() {
           <NavText href='/restaurant_search' text='RESTAURANTS' />
           <NavText href='/songs' text='RECOMMENDER' /> 
           <NavText href='/random' text='RANDOM!' />
+          <NavText href='/restaurantsearch' text='RESTAURANTS' />
+          <NavText href='/recommender' text='RECOMMENDER' /> 
+          <NavText href='/songs' text='RANDOM!' />
+          <NavText href='/yelpsters' text="INFLUENTIAL YELPSTERS"/>
           <Badge badgeContent={cartItemsCount} color='primary' sx={{ ml: 'auto' }}>
             <IconButton as="a" href="/cart" edge="end" color="inherit" aria-label="shoppingcart" sx={{ ml: 'auto' }}>
               <FaShoppingCart size={24} />

@@ -11,6 +11,11 @@ import AlbumInfoPage from './pages/AlbumInfoPage';
 import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage';
 import Random from './pages/Random';
 import Cart from './pages/ShoppingCart';
+import AlbumInfoPage from './pages/AlbumInfoPage'
+import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage';
+import RecommenderPage from './pages/RecommenderPage';
+import ReviewsPage from "./pages/ReviewsPage";
+import YelpstersPage from "./pages/YelpstersPage";
 
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
@@ -34,11 +39,17 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/albums" element={<AlbumsPage />} />
+          {/* <Route path="/albums/:album_id" element={<AlbumInfoPage />} /> */}
+          <Route path="/restaurantsearch" element={<SongsPage />} />
+          <Route path="/nearby_restaurants" element={<NearbyRestaurantsPage />} />
+          <Route path="/recommender" element={<RecommenderPage />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
           <Route path="/restaurant_search" element={<SongsPage />} />
           <Route path="/nearby_restaurants" element={<NearbyRestaurantsPage />} />
           <Route path="/random" element={<Random />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/yelpsters" element={<YelpstersPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

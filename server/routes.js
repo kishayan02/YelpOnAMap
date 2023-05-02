@@ -186,16 +186,24 @@ const search_restaurants = async function(req, res) {
   const lat = req.query.latitude;
   const long = req.query.longitude;
   const maxDistance = req.query.dist;
+  const cuisineSearch = req.query.cuisine;
+  const jap = req.query.japanese;
+  console.log("Hello");
+  console.log(jap);
+  console.log(cuisineSearch);
+  console.log("Bye... grabbing restaurants");
+  let result2 = cuisineSearch.replace(/_/g, " ");
+  let result = result2.replace(/%27/g, "'");
   if (restaurantName == '') {
     if (eliteOnly == 1) {
       //just look at eliteOnly reviews
       connection.query(`
       SELECT R.business_id as id, name, stars, review_count, distance, address
-      FROM (SELECT business_id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371,2) AS distance
+      FROM (SELECT business_id, name, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371,2) AS distance
           FROM Restaurants
-          WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}) R INNER JOIN  
+          WHERE ${result} ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}) R INNER JOIN  
           (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
-          FROM reviews_1
+          FROM Reviews
           WHERE user_id in (SELECT user_id FROM Users WHERE elite IS NOT NULL)
           GROUP BY business_id) E ON R.business_id = E.business_id
       WHERE stars >= ${minstars} and stars <= ${maxstars}
@@ -216,9 +224,9 @@ const search_restaurants = async function(req, res) {
     } else {
       //all reviews
       connection.query(`
-      SELECT business_id as id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, stars, review_count, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+      SELECT business_id as id, name, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, stars, review_count, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
       FROM Restaurants
-      WHERE stars >= ${minstars} and stars <= ${maxstars}
+      WHERE ${result} stars >= ${minstars} and stars <= ${maxstars}
           AND review_count >= ${minreviews} and review_count <= ${maxreviews}
           AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
       ORDER BY stars * review_count DESC`
@@ -241,12 +249,12 @@ const search_restaurants = async function(req, res) {
       //just look at eliteOnly reviews
       connection.query(`
       SELECT R.business_id as id, name, stars, review_count, distance, address
-      FROM (SELECT business_id, name, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+      FROM (SELECT business_id, name, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
              FROM Restaurants 
-             WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+             WHERE ${result} ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
                     AND name LIKE '%${restaurantName}%') R INNER JOIN  
           (SELECT business_id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
-          FROM reviews_1
+          FROM Reviews
           WHERE user_id in (SELECT user_id FROM Users WHERE elite IS NOT NULL)
           GROUP BY business_id) E ON R.business_id = E.business_id
       WHERE stars >= ${minstars} and stars <= ${maxstars}
@@ -266,9 +274,9 @@ const search_restaurants = async function(req, res) {
     });
     } else {
       connection.query(`
-      SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+      SELECT business_id as id, name, stars, review_count, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
       FROM Restaurants
-      WHERE name LIKE '%${restaurantName}%'
+      WHERE ${result} name LIKE '%${restaurantName}%'
           AND stars >= ${minstars} and stars <= ${maxstars}
           AND review_count >= ${minreviews} and review_count <= ${maxreviews}
           AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
@@ -310,6 +318,134 @@ const random_restaurant = async function(req, res) {
       res.json({});
     } else {
       // return random  
+      res.json(data)
+    }
+  });
+}
+
+const restaurant_info = async function(req, res) {
+  const business_id = req.query.restaurant_id;
+  const longitude = req.query.longitude;
+  const latitude = req.query.latitude;
+  console.log("getting - info");
+  connection.query(`
+    SELECT business_id as id, name, stars, review_count, ROUND(ST_Distance_Sphere(point(${longitude}, ${latitude}), point(longitude, latitude)) * 0.000621371, 2) as distance
+    FROM Restaurants
+    WHERE business_id = '${business_id}';
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      console.log("empty - info reviews");
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info");
+      
+      res.json(data[0]);
+      console.log(data[0]);
+    }
+  });
+}
+const restaurant_reviews_peek = async function(req, res) {
+  console.log("getting - info reviews");
+  const business_id = req.query.restaurant_id;
+  connection.query(`
+  SELECT R.review_id as id, text, stars
+  FROM (SELECT review_id FROM ReviewsWithText_1 WHERE business_id = '${business_id}') R
+  JOIN ReviewsWithText_1 R2 ON R.review_id = R2.review_id
+  LIMIT 10;
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - info reviews");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info reviews");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+}
+
+const restaurant_reviews_stare = async function(req, res) {
+  console.log("getting - info reviews full");
+  const business_id = req.query.restaurant_id;
+  console.log(business_id);
+  //(elite IS NULL) AS elite
+  connection.query(`
+  select name, average_stars, text, stars, id, elite
+  FROM (SELECT user_id as id, text, stars FROM ReviewsWithText_1 WHERE business_id = '${business_id}' LIMIT 10) AS R
+  JOIN (SELECT name, average_stars, user_id, (CASE
+        WHEN (elite IS NULL) = 1 THEN "Yes"
+        ELSE "No"
+    END) AS elite FROM Users) U ON R.id = U.user_id
+LIMIT 10
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - info reviews full");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info reviews full");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+}
+
+const recommender = async function(req, res) {
+  const cuisine = req.query.cuisine ?? '';
+  const minStars = req.query.minStars ?? 0;
+  const minReviews = req.query.minReviews ?? 0;
+  const distance = req.query.distance ?? 3000;
+  const lat = req.query.lat ?? 39.952305;
+  const long = req.query.long ?? -75.193703;
+
+  // Here is a complete example of how to query the database in JavaScript.
+  // Only a small change (unrelated to querying) is required for TASK 3 in this route.
+  connection.query(`
+    WITH top_postal AS (
+      SELECT postal_code
+      FROM Restaurants
+      WHERE categories LIKE '%${cuisine}%' AND
+        stars >= ${minStars} AND review_count >= ${minReviews}
+        AND ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${distance}
+      GROUP BY postal_code
+      ORDER BY COUNT(name) DESC
+      LIMIT 1
+    )
+    SELECT business_id, name, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, stars, latitude, longitude, review_count,
+      ROUND(ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371, 2) as distance
+    FROM Restaurants
+    WHERE postal_code = (SELECT postal_code FROM top_postal) 
+      AND categories LIKE '%${cuisine}%' AND
+      stars >= ${minStars} AND review_count >= ${minReviews}
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      res.json([]);
+    } else {
       res.json(data);
     }
   });
@@ -412,10 +548,204 @@ const cart_recommend = async function(req, res) {
   });
 }
 
+const restaurant_get_name_from_id = async function(req, res) {
+  console.log("getting - info name");
+  const business_id = req.query.restaurant_id;
+  
+  connection.query(`
+  SELECT name
+  FROM Restaurants
+  WHERE business_id = '${business_id}'
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - info  name");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - info  name");
+      
+      res.json(data[0]);
+      console.log(data[0].name);
+    }
+  });
+}
+
+
+const influential_yelpsters_people = async function(req, res) {
+  console.log("getting - yelpsters ppl");
+  const minYear = req.query.year;
+  const minReviews = req.query.reviews;
+  const minUseful = req.query.useful;
+  const minFans = req.query.fans;
+  const minStarsAVG = req.query.minstars;
+  const eliteOnly = req.query.eliteOnly === 'true' ? 1 : 0;
+  if (eliteOnly === 1) {
+    connection.query(`
+    SELECT user_id as id, name, review_count, YEAR(yelping_since) as yelp_year, average_stars, fans, useful
+    FROM Users
+    WHERE YEAR(yelping_since) <= ${minYear} # default, change based on user input
+        AND elite IS not NULL
+        AND review_count >= ${minReviews} # default, change based on user input
+        AND useful >= ${minUseful}
+        AND fans >= ${minFans}
+        AND average_stars >= ${minStarsAVG}
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - yelpsters ppl");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - yelpsters ppl");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+  } else {
+    connection.query(`
+    SELECT user_id as id, name, review_count, YEAR(yelping_since) as yelp_year, average_stars, fans, useful
+    FROM Users
+    WHERE YEAR(yelping_since) <= ${minYear} # default, change based on user input
+        AND review_count >= ${minReviews} # default, change based on user input
+        AND useful >= ${minUseful}
+        AND fans >= ${minFans}
+        AND average_stars >= ${minStarsAVG}
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - yelpsters ppl");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - yelpsters ppl");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+  }
+}
+
+const getInfluentialRecommendations  = async function(req, res) {
+  console.log("getting - yelpsters rec");
+  const minYear = req.query.year;
+  const minReviews = req.query.reviews;
+  const minUseful = req.query.useful;
+  const minFans = req.query.fans;
+  const minStarsAVG = req.query.minstars;
+  const eliteOnly = req.query.eliteOnly === 'true' ? 1 : 0;
+
+  if (eliteOnly === 1) {
+    connection.query(`
+    WITH users as (
+      SELECT user_id
+      FROM Users
+      WHERE YEAR(yelping_since) <= ${minYear} # default, change based on user input
+        AND elite is NOT NULL
+          AND review_count >= ${minReviews} # default, change based on user input
+          AND useful >= ${minUseful}
+          AND fans >= ${minFans}
+          AND average_stars >= ${minStarsAVG}
+      LIMIT 10)
+    SELECT name, id, address, B.stars, B.review_count
+    FROM(
+        SELECT business_id as id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
+        FROM Reviews
+        WHERE user_id IN (SELECT user_id FROM users)
+        GROUP BY business_id
+        )   B
+    JOIN (SELECT name, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, business_id FROM  Restaurants) R ON B.id = R.business_id;
+
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - yelpsters rec");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - yelpsters rec");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+  } else {
+    connection.query(`
+    WITH users as (
+      SELECT user_id
+      FROM Users
+      WHERE YEAR(yelping_since) <= ${minYear} # default, change based on user input
+          AND review_count >= ${minReviews} # default, change based on user input
+          AND useful >= ${minUseful}
+          AND fans >= ${minFans}
+          AND average_stars >= ${minStarsAVG}
+      LIMIT 10)
+    SELECT name, id, address, B.stars, B.review_count
+    FROM(
+        SELECT business_id as id, ROUND(AVG(stars), 2) as stars, COUNT(*) as review_count
+        FROM Reviews
+        WHERE user_id IN (SELECT user_id FROM users)
+        GROUP BY business_id
+        )   B
+    JOIN (SELECT name, CONCAT(address,", ",city,", ",state, " ", postal_code) as address, business_id FROM  Restaurants) R ON B.id = R.business_id;
+
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log("empty - yelpsters rec");
+      console.log(err);
+      res.json({});
+    } else {
+      // Here, we return results of the query as an object, keeping only relevant data
+      // being song_id and title which you will add. In this case, there is only one song
+      // so we just directly access the first element of the query results array (data)
+      // TODO (TASK 3): also return the song title in the response
+      console.log("received - yelpsters rec");
+      
+      res.json(data);
+      console.log(data);
+    }
+  });
+  }
+  
+}
+
+
 module.exports = {
   hello,
   random,
   nearby_restaurants,
+  search_restaurants,
+  recommender,
+  restaurant_info,
+  restaurant_reviews_peek,
+  restaurant_reviews_stare,
+  restaurant_get_name_from_id,
+  influential_yelpsters_people,
+  getInfluentialRecommendations,
   search_restaurants,
   random_restaurant,
   get_cart,

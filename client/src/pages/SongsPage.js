@@ -3,8 +3,7 @@ import { Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, Text
 import Stack from '@mui/material/Stack';
 import { DataGrid} from '@mui/x-data-grid';
 
-
-import SongCard from '../components/SongCard';
+import RestaurantCard from '../components/RestaurantCard';
 //import ShoppingCart from '../components/ShoppingCart';
 
 import {GiFastNoodles, GiNoodleBall, GiSushis, GiChickenLeg, GiTacos} from 'react-icons/gi';
@@ -19,7 +18,7 @@ const config = require('../config.json');
 export default function SongsPage() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
-  const [selectedSongId, setSelectedSongId] = useState(null);
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
   const queryParameters = new URLSearchParams(window.location.search);
   const [userLat, setUserLat] = useState(queryParameters.get("latitude"));
   const [userLong, setUserLong] = useState(queryParameters.get("longitude"));
@@ -36,13 +35,10 @@ export default function SongsPage() {
   //
   const [restaurantData, setRestaurantData] = useState([]);
   // Sets currently examined restaurant
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
+  
 
   // Sets minimum number of stars for that restaurant
   const [stars, setStars] = useState([0, 5]);
-
-  // Sets preferred cuisine for that restaurant
-  const [cuisine, setCuisine] = useState([]);
 
   // Sets minimum number of reviews wanted for that restaurant
   //const [reviews, setReviews] = useState([0, 1000]);
@@ -63,6 +59,10 @@ export default function SongsPage() {
   const [korean, setKorean] = useState(false);
   const [thai, setThai] = useState(false);
   const [fastFood, setFastFood] = useState(false);
+  // Sets preferred cuisine for that restaurant
+  const cuisineNames = ["Burgers", "Chinese", "Italian", "Pizza", "Japanese", "Mexican", "Korean", "Thai", "Fast_Food"];
+  const [cuisineBus, setCuisineBus] = useState([false, false, false, false, false, false, false, false, false]);
+  const [cuisineSearch, setCuisineSearch] = useState("");
   // Sets minimum number of reviews wanted for that restaurant
   const [reviews, setReviews] = useState([0, 10000]);
 
@@ -77,6 +77,7 @@ export default function SongsPage() {
   const [eliteOnly, setEliteOnly] = useState(false);
   const [eliteStarColumnName, setEliteStarColumnName] = useState("Stars");
   const [eliteReviewColumnName, setEliteReviewColumnName] = useState("Reviews");
+
   
 
   // Hooks for each cuisine type
@@ -99,6 +100,7 @@ export default function SongsPage() {
   const [energy, setEnergy] = useState([0, 1]);
   const [valence, setValence] = useState([0, 1]);
   const [explicit, setExplicit] = useState(false);
+
   
   const searchRestaurants = () => {
     fetch(`http://${config.server_host}:${config.server_port}/restaurant_search?minstars=${stars[0]}` +
@@ -109,7 +111,9 @@ export default function SongsPage() {
       `&restaurantName=${restaurantName}` +
       `&latitude=${userLat}` + 
       `&longitude=${userLong}` + 
-      `&dist=${distance}`
+      `&dist=${distance}` +
+      `&cuisine=${cuisineSearch}`+ 
+      `&japanese=${cuisineBus[4]}`
     )
       .then(res => res.json())
       .then(resJson => setRestaurantData(resJson));
@@ -123,11 +127,14 @@ export default function SongsPage() {
       `&restaurantName=${restaurantName}` +
       `&latitude=${userLat}` + 
       `&longitude=${userLong}` + 
-      `&dist=${distance}`
+      `&dist=${distance}`+
+      `&cuisine=${cuisineSearch}` + 
+      `&japanese=${cuisineBus[4]}`
     )
       .then(res => res.json())
       .then(resJson => setRestaurantData(resJson));
   }, []);
+
 
   const addToCart = (e) => {
     let currCart = JSON.parse(sessionStorage.getItem('cart')) || [];
@@ -143,7 +150,7 @@ export default function SongsPage() {
   // instead of loading only the data we need (which is necessary in order to be able to sort by column)
   const columns = [
     { field: 'name', headerName: 'Restaurant', width: 250, renderCell: (params) => (
-      <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
+      <Link onClick={() => setSelectedRestaurantId(params.row.id)}>{params.value}</Link>
   ) },
     { field: 'stars', headerName: eliteStarColumnName, width: 100 },
     { field: 'review_count', headerName: eliteReviewColumnName , width: 100 },
@@ -170,11 +177,71 @@ export default function SongsPage() {
       }
     }
   ]
-  
+  //burgers, chinese, italian, pizza, japanese, mexican, korean, thai, fastFood
   const eliteButtonClickChange = (e) => {
     setEliteOnly(e.target.checked)
   }
-  const serachButtonClickChange = () => {
+
+  const cuisineChange = (e, cuisineNum) => {
+    let tempBus = cuisineBus;
+    tempBus[cuisineNum] = e.target.checked;
+    setCuisineBus(tempBus);
+    finalizeCuisine();
+    if (cuisineNum === 0) {
+      setBurgers(e.target.checked);
+    } else if (cuisineNum === 1) {
+      setChinese(e.target.checked);
+    } else if (cuisineNum === 2) {
+      setItalian(e.target.checked);
+    } else if (cuisineNum === 3) {
+      setPizza(e.target.checked);
+    } else if (cuisineNum === 4) {
+      setJapanese(e.target.checked);
+    } else if (cuisineNum === 5) {
+      setMexican(e.target.checked);
+    } else if (cuisineNum === 6) {
+      setKorean(e.target.checked);
+    } else if (cuisineNum === 7) {
+      setThai(e.target.checked);
+    } else if (cuisineNum === 8) {
+      setFastFood(e.target.checked);
+    }
+    
+  } 
+
+  //categories_LIKE_'%Mexican%'_AND
+  const finalizeCuisine = () => {
+    let countCuisines = 0; 
+    const cuisinesChecked = [];
+    let returnString = "";
+    for (let i = 0; i < cuisineBus.length; i++) {
+      if (cuisineBus[i]) {
+        cuisinesChecked[countCuisines] = cuisineNames[i];
+        countCuisines += 1;
+      }
+    }
+    if (cuisinesChecked.length === 1) {
+      returnString += `(categories_LIKE_'%${cuisinesChecked[0]}%')_AND_`;
+      setCuisineSearch(returnString);
+    } else if (cuisinesChecked.length > 0) {
+      //make string categories like ___ OR for all until last which is categories like ___ AND
+      returnString +=  `(`;
+      for (let i = 0; i < cuisinesChecked.length - 1; i++) {
+        returnString += `categories_LIKE_'%${cuisinesChecked[i]}%'_OR_`;
+      }
+      returnString += `categories_LIKE_'%${cuisinesChecked[cuisinesChecked.length - 1]}%')_AND_`;
+      console.log(returnString);
+      setCuisineSearch(returnString);
+    } else {
+      //empty string since nada
+      console.log("Empty");
+      setCuisineSearch("");
+    }
+    
+  }
+  const searchButtonClickChange = () => {
+    //first create and set cuisine search
+    finalizeCuisine()
     searchRestaurants()
     if (eliteOnly) {
       setEliteStarColumnName("Elite Stars")
@@ -195,7 +262,7 @@ export default function SongsPage() {
   // will automatically lay out all the grid items into rows based on their xs values.
   return (
       <Container>
-      {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
+      {selectedRestaurantId && <RestaurantCard restaurantId={selectedRestaurantId} lat={userLat} longi={userLong} handleClose={() => setSelectedRestaurantId(null)} />}
       <h2>Search Restaurants</h2>
       <Grid container spacing={6}>
         <Grid item xs={8}>
@@ -214,33 +281,17 @@ export default function SongsPage() {
               min={0}
               max={50}
               step={5}
+              marks
               onChange={(e, newValue) => setDistance(newValue)}
               valueLabelDisplay='auto'
               valueLabelFormat={value => <div>{value + " miles"}</div>}
             />
             <Grid item>
-            <Input
-              value={distance}
-              size="small"
-              onChange={(e, newValue) => setDistance(e.target.value === '' ? '' : Number(e.target.value))}
-              /*onBlur={handleBlur}*/
-              inputProps={{
-                step: 5,
-                min: 0,
-                max: 50,
-                type: 'number',
-                'aria-labelledby': 'input-slider',
-              }}
-            />
           </Grid>
           
         </Grid>
-        <Grid item xs={2}>
-          <p>Number of Stars</p>
-          <TextField label='Restaurant Name' value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }}/>
-        </Grid>
   
-        <Grid item xs={6}>
+        <Grid item xs={2}>
           <p>Stars</p>
           <Slider
             value={stars}
@@ -273,70 +324,70 @@ export default function SongsPage() {
             <GiFastNoodles size={28} display={'flex'}/>
             <FormControlLabel
                 label='Chinese'
-                control={<Checkbox checked={chinese} onChange={(e) => setChinese(e.target.checked)} />}
+                control={<Checkbox checked={chinese} onChange={(e) => cuisineChange(e, 1)} />}
             />
           </Grid>
           <Grid item xs={1.25}>
             <FaHamburger size={28} display={'flex'}/>
               <FormControlLabel
                 label='Burgers'
-                control={<Checkbox checked={burgers} onChange={(e) => setBurgers(e.target.checked)} />}
+                control={<Checkbox checked={burgers} onChange={(e) => cuisineChange(e, 0)} />}
               />
           </Grid>
           <Grid item xs={1.25}>
             <GiNoodleBall size={28} display={'flex'}/>
               <FormControlLabel
                 label='Italian'
-                control={<Checkbox checked={italian} onChange={(e) => setItalian(e.target.checked)} />}
+                control={<Checkbox checked={italian} onChange={(e) => cuisineChange(e, 2)} />}
               />
           </Grid>
           <Grid item xs={1.25}>
             <FaPizzaSlice size={28} display={'flex'}/>
               <FormControlLabel
                 label='Pizza'
-                control={<Checkbox checked={pizza} onChange={(e) => setPizza(e.target.checked)} />}
+                control={<Checkbox checked={pizza} onChange={(e) => cuisineChange(e, 3)} />}
               />
           </Grid>
           <Grid item xs={1.25}>
             <GiSushis size={28} display={'flex'}/>
             <FormControlLabel
               label='Japanese'
-              control={<Checkbox checked={japanese} onChange={(e) => setJapanese(e.target.checked)} />}
+              control={<Checkbox checked={japanese} onChange={(e) => cuisineChange(e, 4)} />}
             />
           </Grid>
           <Grid item xs={1.25}>
             <GiTacos size={28} display={'flex'}/>
             <FormControlLabel
               label='Mexican'
-              control={<Checkbox checked={mexican} onChange={(e) => setMexican(e.target.checked)} />}
+              control={<Checkbox checked={mexican} onChange={(e) => cuisineChange(e, 5)} />}
             />
           </Grid>
           <Grid item xs={1.25}>
             <GiChickenLeg size={28} display={'flex'}/>
             <FormControlLabel
               label='Korean'
-              control={<Checkbox checked={korean} onChange={(e) => setKorean(e.target.checked)} />}
+              control={<Checkbox checked={korean} onChange={(e) => cuisineChange(e, 6)} />}
             />
           </Grid>
           <Grid item xs={1.25}>
             <FaBoxTissue size={28} display={'flex'}/>
             <FormControlLabel
               label='Thai'
-              control={<Checkbox checked={thai} onChange={(e) => setThai(e.target.checked)} />}
+              control={<Checkbox checked={thai} onChange={(e) => cuisineChange(e, 7)} />}
             />
           </Grid>
           <Grid item xs={1.25}>
             <IoFastFood size={28} display={'flex'}/>
             <FormControlLabel
               label='Fast Food'
-              control={<Checkbox checked={fastFood} onChange={(e) => setFastFood(e.target.checked)} />}
+              control={<Checkbox checked={fastFood} onChange={(e) => cuisineChange(e, 8)} />}
             />
           </Grid>
       </Grid>
         
         {/* TODO (TASK 24): add sliders for danceability, energy, and valence (they should be all in the same row of the Grid) */}
         {/* Hint: consider what value xs should be to make them fit on the same row. Set max, min, and a reasonable step. Is valueLabelFormat is necessary? */}
-      <Button color="primary" onClick={() => serachButtonClickChange() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
+      <Button color="primary" onClick={() => searchButtonClickChange() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
       </Button>
       <h2>Results</h2>
@@ -348,7 +399,6 @@ export default function SongsPage() {
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         autoHeight
-        checkboxSelection
         components={{
           NoRowsOverlay: () => (
             <Stack height="100%" alignItems="center" justifyContent="center">
