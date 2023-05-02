@@ -3,8 +3,6 @@ import { Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, Text
 import Stack from '@mui/material/Stack';
 import { DataGrid} from '@mui/x-data-grid';
 
-
-import SongCard from '../components/SongCard';
 import RestaurantCard from '../components/RestaurantCard';
 //import ShoppingCart from '../components/ShoppingCart';
 
@@ -140,6 +138,8 @@ export default function SongsPage() {
 
   const addToCart = (e) => {
     let currCart = JSON.parse(sessionStorage.getItem('cart')) || [];
+    console.log("currCart: " + currCart );
+    console.log("e value: " + e);
     currCart.push(e);
     sessionStorage.setItem('cart', JSON.stringify(currCart));
   }
@@ -167,7 +167,7 @@ export default function SongsPage() {
                   size="small"
                   style={{ marginLeft: 16 }}
                   onClick={() => {
-                    addToCart(params.row.selectedRestaurantId)
+                    addToCart(params.row.id)
                   }}
               >
                 <FaPlus size={8}/>
