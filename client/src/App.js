@@ -11,8 +11,6 @@ import AlbumInfoPage from './pages/AlbumInfoPage';
 import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage';
 import Random from './pages/Random';
 import Cart from './pages/ShoppingCart';
-import AlbumInfoPage from './pages/AlbumInfoPage'
-import NearbyRestaurantsPage from './pages/NearbyRestaurantsPage';
 import RecommenderPage from './pages/RecommenderPage';
 import ReviewsPage from "./pages/ReviewsPage";
 import YelpstersPage from "./pages/YelpstersPage";
