@@ -382,34 +382,119 @@ const restaurant_reviews_peek = async function(req, res) {
 const restaurant_reviews_stare = async function(req, res) {
   console.log("getting - info reviews full");
   const business_id = req.query.restaurant_id;
-  console.log(business_id);
+  const all = req.query.all === 'true' ? 1 : 0;
+  const elite = req.query.elite === 'true' ? 1 : 0;
+  const stars = req.query.stars;
+  console.log(business_id,all, stars);
   //(elite IS NULL) AS elite
-  connection.query(`
-  select name, average_stars, text, stars, id, elite
-  FROM (SELECT user_id as id, text, stars FROM ReviewsWithText_1 WHERE business_id = '${business_id}' LIMIT 10) AS R
-  JOIN (SELECT name, average_stars, user_id, (CASE
-        WHEN (elite IS NULL) = 1 THEN "Yes"
-        ELSE "No"
-    END) AS elite FROM Users) U ON R.id = U.user_id
-LIMIT 10
-  `, (err, data) => {
-    if (err || data.length === 0) {
-      // if there is an error for some reason, or if the query is empty (this should not be possible)
-      // print the error message and return an empty object instead
-      console.log("empty - info reviews full");
-      console.log(err);
-      res.json({});
+  if (elite == 1) {
+    if (all == 1) {
+      connection.query(`
+        select name, average_stars, text, stars, id, elite
+        FROM (SELECT user_id as id, text, stars FROM ReviewsWithText_1 WHERE business_id = '${business_id}' LIMIT 50) AS R
+        JOIN (SELECT name, average_stars, user_id, "Yes" AS elite FROM Users WHERE elite IS NOT NULL) U ON R.id = U.user_id
+    `, (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log("empty - info reviews full elite all");
+        console.log(err);
+        res.json({});
+      } else {
+        // Here, we return results of the query as an object, keeping only relevant data
+        // being song_id and title which you will add. In this case, there is only one song
+        // so we just directly access the first element of the query results array (data)
+        // TODO (TASK 3): also return the song title in the response
+        console.log("received - info reviews full elite all");
+        
+        res.json(data);
+        console.log(data);
+      }
+    });
     } else {
-      // Here, we return results of the query as an object, keeping only relevant data
-      // being song_id and title which you will add. In this case, there is only one song
-      // so we just directly access the first element of the query results array (data)
-      // TODO (TASK 3): also return the song title in the response
-      console.log("received - info reviews full");
-      
-      res.json(data);
-      console.log(data);
+      connection.query(`
+      select name, average_stars, text, stars, id, elite
+      FROM (SELECT user_id as id, text, stars FROM ReviewsWithText_1 WHERE business_id = '${business_id}' AND stars = ${stars} LIMIT 10) AS R
+      JOIN (SELECT name, average_stars, user_id, "Yes" AS elite FROM Users WHERE elite IS NOT NULL) U ON R.id = U.user_id
+    `, (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log("empty - info reviews elite full");
+        console.log(err);
+        res.json({});
+      } else {
+        // Here, we return results of the query as an object, keeping only relevant data
+        // being song_id and title which you will add. In this case, there is only one song
+        // so we just directly access the first element of the query results array (data)
+        // TODO (TASK 3): also return the song title in the response
+        console.log("received - info reviews elite full");
+        
+        res.json(data);
+        console.log(data);
+      }
+    });
     }
-  });
+
+  } else {
+    if (all == 1) {
+      connection.query(`
+        select name, average_stars, text, stars, id, elite
+        FROM (SELECT user_id as id, text, stars FROM ReviewsWithText_1 WHERE business_id = '${business_id}' LIMIT 10) AS R
+        JOIN (SELECT name, average_stars, user_id, (CASE
+              WHEN (elite IS NULL) = 1 THEN "Yes"
+              ELSE "No"
+          END) AS elite FROM Users) U ON R.id = U.user_id
+      LIMIT 10
+    `, (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log("empty - info reviews full all");
+        console.log(err);
+        res.json({});
+      } else {
+        // Here, we return results of the query as an object, keeping only relevant data
+        // being song_id and title which you will add. In this case, there is only one song
+        // so we just directly access the first element of the query results array (data)
+        // TODO (TASK 3): also return the song title in the response
+        console.log("received - info reviews full all");
+        
+        res.json(data);
+        console.log(data);
+      }
+    });
+    } else {
+      connection.query(`
+      select name, average_stars, text, stars, id, elite
+      FROM (SELECT user_id as id, text, stars FROM ReviewsWithText_1 WHERE business_id = '${business_id}' AND stars = ${stars} LIMIT 10) AS R
+      JOIN (SELECT name, average_stars, user_id, (CASE
+            WHEN (elite IS NULL) = 1 THEN "Yes"
+            ELSE "No"
+        END) AS elite FROM Users) U ON R.id = U.user_id
+    LIMIT 10
+    `, (err, data) => {
+      if (err || data.length === 0) {
+        // if there is an error for some reason, or if the query is empty (this should not be possible)
+        // print the error message and return an empty object instead
+        console.log("empty - info reviews full");
+        console.log(err);
+        res.json({});
+      } else {
+        // Here, we return results of the query as an object, keeping only relevant data
+        // being song_id and title which you will add. In this case, there is only one song
+        // so we just directly access the first element of the query results array (data)
+        // TODO (TASK 3): also return the song title in the response
+        console.log("received - info reviews full");
+        
+        res.json(data);
+        console.log(data);
+      }
+    });
+    }
+  }
+  
+    
 }
 
 const recommender = async function(req, res) {

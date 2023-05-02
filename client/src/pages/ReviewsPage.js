@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
+import Stack from '@mui/material/Stack';
 
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 
@@ -31,36 +32,31 @@ export default function ReviewsPage() {
 
   //hook for setting if we're only displaying reviews from elite users or not
   const [isElite, setElite] = useState(false);
+  const [allReviews, setAllReviews] = useState(true);
 
   //hook for setting what we want the average reviewer's min and max average star rating to be
-  const [avgStars, setAvgStars] = useState([0, 5]);
+  const [avgStars, setAvgStars] = useState(3);
 
   const [restaurantName, setRestaurantName] = useState({});
 
   const [selectedSongId, setSelectedSongId] = useState(null);
 
   useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/restaurant_reviews_stare?restaurant_id=${restaurant_Id}`)
+    fetch(`http://${config.server_host}:${config.server_port}/restaurant_reviews_stare?restaurant_id=${restaurant_Id}`+
+        `&all=${allReviews}` + 
+        `&stars=${avgStars}` + 
+        `&elite=${isElite}`  )
       .then(res => res.json())
       .then(resJson => setData(resJson));
   }, []);
 
   const search = () => {
-    // fetch(`http://${config.server_host}:${config.server_port}/search_songs?name=${name}` +
-    //   `&duration_low=${duration[0]}&duration_high=${duration[1]}` +
-    //   `&plays_low=${plays[0]}&plays_high=${plays[1]}` +
-    //   `&danceability_low=${danceability[0]}&danceability_high=${danceability[1]}` +
-    //   `&energy_low=${energy[0]}&energy_high=${energy[1]}` +
-    //   `&valence_low=${valence[0]}&valence_high=${valence[1]}` +
-    //   `&explicit=${explicit}`
-    // )
-    //   .then(res => res.json())
-    //   .then(resJson => {
-    //     // DataGrid expects an array of objects with a unique id.
-    //     // To accomplish this, we use a map with spread syntax (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
-    //     const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
-    //     setData(songsWithId);
-    //   });
+    fetch(`http://${config.server_host}:${config.server_port}/restaurant_reviews_stare?restaurant_id=${restaurant_Id}`+
+        `&all=${allReviews}` + 
+        `&stars=${avgStars}` + 
+        `&elite=${isElite}` )
+      .then(res => res.json())
+      .then(resJson => setData(resJson));
   }
 
   // flexFormat provides the formatting options for a "flexbox" layout that enables the album cards to
@@ -83,22 +79,42 @@ export default function ReviewsPage() {
     <Container>
       <h1>Reviews for {restaurant_Name}</h1>
       <Grid container spacing={6}>
-        <Grid item xs={8}>
-          <p>Average Rating of Reviewer</p>
-          <Slider
-              value={avgStars}
-              min={0.0}
-              max={5.0}
-              step={0.5}
-              onChange={(e, newValue) => setAvgStars(newValue)}
-              valueLabelDisplay='auto'
-            />
-        </Grid>
-        <Grid item xs={4}>
-          <FormControlLabel
-            label='Elite Reviewers Only?'
-            control={<Checkbox checked={isElite} onChange={(e) => setElite(e.target.checked)} />}
-          />
+        <Grid item xs={12}>
+          
+          <Stack spacing={1} direction="row" sx={{ mb: 1 }} alignItems="center">
+          <Grid item xs={2}>
+                <FormControlLabel
+                label='All Reviews'
+                control={<Checkbox checked={allReviews} onChange={(e) => setAllReviews(e.target.checked)} />}
+                />
+            </Grid>
+          <Grid item xs={1.5}>
+            <p>Review Ratings:</p>
+                </Grid>
+                
+            <Grid item xs={2}>
+                <Slider disabled={allReviews}
+                value={avgStars}
+                min={0.0}
+                max={5.0}
+                aria-labelledby="track-false-slider"
+                step={1}
+                track={false}
+                marks
+                onChange={(e, newValue) => setAvgStars(newValue)}
+                valueLabelDisplay='auto'
+                />
+            </Grid>
+            <Grid item xs={4}> <p> </p></Grid>
+            <Grid item xs={4}>
+                <FormControlLabel
+                label='Elite Reviewers Only'
+                control={<Checkbox checked={isElite} onChange={(e) => setElite(e.target.checked)} />}
+                />
+            </Grid>
+
+            </Stack>
+          
         </Grid>
       </Grid>
         

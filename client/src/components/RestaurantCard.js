@@ -3,7 +3,7 @@ import { Box, Button, ButtonGroup, Link, Modal } from '@mui/material';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { NavLink } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
-import { DataGrid, gridClasses} from '@mui/x-data-grid';
+import { DataGrid, gridClasses, GridRenderCellParams} from '@mui/x-data-grid';
 
 import { formatDuration } from '../helpers/formatter';
 const config = require('../config.json');
@@ -56,8 +56,9 @@ export default function RestaurantCard({ restaurantId, lat, longi, handleClose }
     sessionStorage.setItem('cart', JSON.stringify(currCart));
   };
 
+  
   const columnsReviews = [
-    { field: 'text', headerName: 'Review', width: 400},
+    { field: 'text', headerName: 'Review', width: 400 },
     { field: 'stars', headerName: "Stars", width: 100 }
   ]
 
@@ -75,23 +76,26 @@ export default function RestaurantCard({ restaurantId, lat, longi, handleClose }
         <p>Reviews: {restaurantData.review_count} </p>
         <p>Stars: {restaurantData.stars}</p>
         <p>Distance: {restaurantData.distance} miles away</p>
-        <NavLink to={`/reviews?restaurant_id=${restaurantData.id}&name=${restaurantData.name}`}>
-          <Button>
-            Click to see reviews for this restaurant!
-          </Button>
-        </NavLink>
-        <ButtonGroup>
-          {//<Button disabled={barRadar} onClick={handleGraphChange}>Bar</Button>}
-}
-        </ButtonGroup>
-        <div style={{ margin: 20 }}>
+        
+          
+        
+        <div style={{ margin: 20 } }>
             <DataGrid
+                rowHeight={100}
+                scrollbarSize={5}
                 rows={reviewsData}
                 columns={columnsReviews}
                 pageSize={pageSize}
                 rowsPerPageOptions={[3, 5, 10]}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 autoHeight
+                getEstimatedRowHeight={() => 100}
+                wordWrapEnabled={true}
+                sx={{
+                    [`& .${gridClasses.cell}`]: {
+                      py: 0.5,
+                    },
+                  }}
                 components={{
                 NoRowsOverlay: () => (
                     <Stack height="100%" alignItems="center" justifyContent="center">
@@ -101,6 +105,11 @@ export default function RestaurantCard({ restaurantId, lat, longi, handleClose }
                 }}
             />
         </div>
+        <Button>
+          <NavLink to={`/reviews?restaurant_id=${restaurantData.id}&name=${restaurantData.name}`}>
+            More Reviews
+            </NavLink>
+          </Button>
         <Button onClick={handleAddToCart} style={{ left: '50%', transform: 'translateX(-50%)' }} >
           Add to Cart
         </Button>
