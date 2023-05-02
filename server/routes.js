@@ -295,8 +295,32 @@ const search_restaurants = async function(req, res) {
     });
     }
   }
-  
-  
+}
+
+const random_restaurant = async function(req, res) {
+  // default is Philly and 5 miles
+  const lat = req.query.latitude ?? 39.9526;
+  const long = req.query.longitude ?? -75.1652;
+  const maxDistance = req.query.dist ?? 5;
+  connection.query(`
+  SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address
+  FROM Restaurants 
+  WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+  ORDER BY RAND()
+  LIMIT 1`
+  , (err, data) => {
+    //   WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      res.send("error");
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data)
+    }
+  });
 }
 
 const restaurant_info = async function(req, res) {
@@ -332,9 +356,9 @@ const restaurant_reviews_peek = async function(req, res) {
   const business_id = req.query.restaurant_id;
   connection.query(`
   SELECT R.review_id as id, text, stars
-FROM (SELECT review_id FROM ReviewsWithText_1 WHERE business_id = '${business_id}') R
-JOIN ReviewsWithText_1 R2 ON R.review_id = R2.review_id
-LIMIT 10;
+  FROM (SELECT review_id FROM ReviewsWithText_1 WHERE business_id = '${business_id}') R
+  JOIN ReviewsWithText_1 R2 ON R.review_id = R2.review_id
+  LIMIT 10;
   `, (err, data) => {
     if (err || data.length === 0) {
       // if there is an error for some reason, or if the query is empty (this should not be possible)
@@ -427,11 +451,102 @@ const recommender = async function(req, res) {
   });
 }
 
-// // Route 4: GET /album/:album_id
-// const album = async function(req, res) {
-//   // TODO (TASK 5): implement a route that given a album_id, returns all information about the album
-//   res.json({}); // replace this with your implementation
-// }
+const get_cart = async function(req, res) {
+  // const page = req.query.page;
+  //const pageSize = req.query.page_size ?? 10;
+  const currId = req.query.id;
+
+  connection.query(`
+  SELECT business_id as id, name, stars, review_count, city, CONCAT(address," ",city,", ",state, " ", postal_code) as address 
+  FROM Restaurants 
+  WHERE business_id LIKE '%${currId}%'`
+  , (err, data) => {
+    //   WHERE ST_Distance_Sphere(point(${long}, ${lat}), point(longitude, latitude)) * 0.000621371 <= ${maxDistance}
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      res.send("error");
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data);
+    }
+  });
+
+  // var q = `
+  //   SELECT business_id as id, name, stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address 
+  //   FROM Restaurants 
+  //   WHERE business_id = '${currId}' `;
+
+  // if (!page) {
+  //   connection.query(q, (err, data) => {
+  //     if (err || data.length === 0) {
+  //       console.log(err);
+  //       res.json([])
+  //     } else{
+  //       res.json(data);
+  //     }
+  //   });
+  // } else {
+  //   const offset = (page - 1) * pageSize; 
+  //   q += `LIMIT ${pageSize} OFFSET ${offset}\n`;
+  //   connection.query(q, (err, data) => {
+  //     if (err || data.length === 0) {
+  //       console.log(err);
+  //       res.json([])
+  //     } else{
+  //       res.json(data);
+  //     }
+  //   });
+}
+
+const random_reviewer = async function(req, res) {
+  const minReviewCount = req.query.review_count ?? 10;
+  connection.query(`
+  SELECT user_id as id, name, review_count, average_stars
+  FROM Users 
+  WHERE review_count >= ${minReviewCount}
+  ORDER BY RAND()
+  LIMIT 1`
+  , (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data);
+    }
+  });
+}
+
+const cart_recommend = async function(req, res) {
+  const chosenCity = req.query.city;
+  connection.query(`
+  WITH elite_users AS
+  (SELECT user_id
+    FROM Users
+    WHERE elite IS NOT null)
+  SELECT DISTINCT R.business_id as id, name, R.stars, review_count, CONCAT(address," ",city,", ",state, " ", postal_code) as address
+  FROM Reviews S JOIN elite_users E ON E.user_id = S.user_id
+      JOIN Restaurants R ON S.business_id = R.business_id
+  WHERE city LIKE '%${chosenCity}%'
+  ORDER BY R.stars DESC
+  LIMIT 5;`
+  , (err, data) => {
+    if (err || data.length === 0) {
+      // if there is an error for some reason, or if the query is empty (this should not be possible)
+      // print the error message and return an empty object instead
+      console.log(err);
+      res.json({});
+    } else {
+      // return random  
+      res.json(data);
+    }
+  });
+}
 
 const restaurant_get_name_from_id = async function(req, res) {
   console.log("getting - info name");
@@ -500,13 +615,13 @@ const influential_yelpsters_people = async function(req, res) {
   });
   } else {
     connection.query(`
-  SELECT user_id as id, name, review_count, YEAR(yelping_since) as yelp_year, average_stars, fans, useful
-  FROM Users
-  WHERE YEAR(yelping_since) <= ${minYear} # default, change based on user input
-      AND review_count >= ${minReviews} # default, change based on user input
-      AND useful >= ${minUseful}
-      AND fans >= ${minFans}
-      AND average_stars >= ${minStarsAVG}
+    SELECT user_id as id, name, review_count, YEAR(yelping_since) as yelp_year, average_stars, fans, useful
+    FROM Users
+    WHERE YEAR(yelping_since) <= ${minYear} # default, change based on user input
+        AND review_count >= ${minReviews} # default, change based on user input
+        AND useful >= ${minUseful}
+        AND fans >= ${minFans}
+        AND average_stars >= ${minStarsAVG}
   `, (err, data) => {
     if (err || data.length === 0) {
       // if there is an error for some reason, or if the query is empty (this should not be possible)
@@ -526,7 +641,6 @@ const influential_yelpsters_people = async function(req, res) {
     }
   });
   }
-  
 }
 
 const getInfluentialRecommendations  = async function(req, res) {
@@ -631,6 +745,10 @@ module.exports = {
   restaurant_reviews_stare,
   restaurant_get_name_from_id,
   influential_yelpsters_people,
-  getInfluentialRecommendations
-
+  getInfluentialRecommendations,
+  search_restaurants,
+  random_restaurant,
+  get_cart,
+  random_reviewer,
+  cart_recommend
 }

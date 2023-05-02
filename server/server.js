@@ -12,10 +12,12 @@ app.use(cors({
 // provide their handlers that we implemented in routes.js
 
 app.get('/', routes.hello);
-// app.get('/author/:type', routes.author);
-app.get('/random', routes.random);
 app.get('/nearby_restaurants', routes.nearby_restaurants)
 app.get('/restaurant_search', routes.search_restaurants)
+app.get('/random_restaurant', routes.random_restaurant)
+app.get('/cart', routes.get_cart)
+app.get('/random_reviewer', routes.random_reviewer)
+app.get('/cart_recommend', routes.cart_recommend)
 app.get('/recommender', routes.recommender)
 app.get('/restaurant_card', routes.restaurant_info)
 app.get('/restaurant_reviews_peek', routes.restaurant_reviews_peek)
